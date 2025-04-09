@@ -9,7 +9,10 @@ const nextConfig: NextConfig = {
       },
       {
         hostname: 'www.alleycat.org'
-      }
+      },
+      {
+        hostname: 'letsenhance.io'  
+      },
     ]
   }
 };
