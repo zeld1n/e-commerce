@@ -11,4 +11,8 @@ export default async function Page() {
   
 
   return <ProductsPage products={products} />;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 4fa2f2d (Back)

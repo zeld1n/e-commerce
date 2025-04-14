@@ -1,4 +1,4 @@
-package com.bogaiciuc.e_commerce.model;
+package com.bogaiciuc.e_commerce.model.repository;
 
 import org.springframework.data.repository.CrudRepository;
 

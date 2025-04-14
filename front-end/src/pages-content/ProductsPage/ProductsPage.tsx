@@ -16,7 +16,11 @@ export default function ProductsPage({ products }: Props) {
 
   const filteredProducts = searchInput
     ? products.filter((product) =>
+<<<<<<< HEAD
         product.title?.toLowerCase().includes(searchInput.toLowerCase())
+=======
+        product.name?.toLowerCase().includes(searchInput.toLowerCase())
+>>>>>>> 4fa2f2d (Back)
       )
     : products; 
 
@@ -65,7 +69,11 @@ export default function ProductsPage({ products }: Props) {
                 key={product.id}
                 className="border rounded-lg p-4 shadow-sm hover:shadow-md transition"
               >
+<<<<<<< HEAD
                 <h3 className="font-semibold text-lg mb-1">{product.title}</h3>
+=======
+                <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
+>>>>>>> 4fa2f2d (Back)
                 <p className="text-gray-700 mb-1">Price: ${product.price}</p>
                 <p className="text-gray-700 mb-2">Quantity: {product.quantity}</p>
 
@@ -109,4 +117,8 @@ export default function ProductsPage({ products }: Props) {
       )}
     </div>
   );
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 4fa2f2d (Back)
