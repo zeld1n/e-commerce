@@ -1,19 +1,19 @@
-package com.bogaiciuc.e_commerce.model;
+package com.bogaiciuc.e_commerce.persistence.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Product {
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private int id;
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
     private float price;
+    @Column(nullable = false)
     private int quantity;
-
+    @Column(nullable = false)
     private String image;
 
     public Product() {
@@ -49,4 +49,22 @@ public class Product {
         return image;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPrice(float price) {
+        this.price = price;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public void setId(int id) {
+    }
 }

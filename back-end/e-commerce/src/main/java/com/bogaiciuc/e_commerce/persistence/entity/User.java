@@ -1,13 +1,8 @@
-package com.bogaiciuc.e_commerce.model;
+package com.bogaiciuc.e_commerce.persistence.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 public class User {
@@ -15,20 +10,53 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String firstName;
+    @Column(nullable = false)
+
     private String lastName;
 
-    @Column(unique = true)
+    @Column(unique = true,nullable = false)
     private String email;
-
+    @Column(nullable = false)
     private String addressStreet;
+
+    @Column(nullable = false)
     private String addressZipCode;
+
+    @Column(nullable = false)
     private String addressCity;
+
+    @Column(nullable = false)
     private String addressCountry;
+
     private String imageUrl;
 
     @Column(nullable = false)
     private LocalDateTime lastSeen;
+
+    @Column(unique = true,nullable = false)
+    private String username;
+
+    @Column(nullable = false)
+    private String password;
+
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     public Long getId() {
         return id;

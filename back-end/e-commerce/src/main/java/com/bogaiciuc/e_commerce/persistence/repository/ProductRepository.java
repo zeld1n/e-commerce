@@ -1,7 +1,7 @@
-package com.bogaiciuc.e_commerce.model.repository;
+package com.bogaiciuc.e_commerce.persistence.repository;
 
+import com.bogaiciuc.e_commerce.persistence.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
