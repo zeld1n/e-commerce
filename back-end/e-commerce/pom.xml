@@ -80,7 +80,7 @@
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 		<dependency>
-<<<<<<< Updated upstream
+
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
@@ -92,8 +92,6 @@
             <version>4.13.1</version>
         </dependency>
 		<dependency>
-=======
->>>>>>> Stashed changes
 			<groupId>commons-validator</groupId>
 			<artifactId>commons-validator</artifactId>
 			<version>1.7</version>
