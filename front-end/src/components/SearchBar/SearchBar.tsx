@@ -28,7 +28,7 @@ const SearchBar: React.FC<Props> = ({ products }) => {
         {products.map((product, index) => {
           if (
             searchInput &&
-            !(product.title?.toLowerCase().includes(searchInput.toLowerCase()))
+            !(product.name?.toLowerCase().includes(searchInput.toLowerCase()))
           ) {
             return null;
           }
@@ -41,7 +41,7 @@ const SearchBar: React.FC<Props> = ({ products }) => {
               {product.image ? (
                 <Image
                   src={product.image}
-                  alt={product.title || 'product image'}
+                  alt={product.name || 'product image'}
                   width={100}
                   height={100}
                   className="mb-3"
@@ -49,7 +49,7 @@ const SearchBar: React.FC<Props> = ({ products }) => {
               ) : (
                 <div className="mb-3 text-sm text-gray-500">No image available</div>
               )}
-              <h3 className="text-lg font-semibold">Title: {product.title}</h3>
+              <h3 className="text-lg font-semibold">Title: {product.name}</h3>
               <p className="text-gray-700">Price: ${product.price}</p>
               <p className="text-gray-700">Quantity: {product.quantity}</p>
             </div>
