@@ -29,10 +29,8 @@ export default function AuthForm() {
     imageUrl: "",
   });
 
-  // Переключение между режимами регистрации и входа
   const toggleMode = () => {
     setIsSignUp(!isSignUp);
-    // Очистка формы при смене режима
     setFormData({
       firstName: "",
       lastName: "",
@@ -47,12 +45,10 @@ export default function AuthForm() {
     });
   };
 
-  // Обработчик изменения значения в форме
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Отправка формы
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   
@@ -69,7 +65,6 @@ export default function AuthForm() {
       const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // Убираем 'credentials: "include"', чтобы запросы не отправляли cookies
         body: JSON.stringify(payload),
       });
   
@@ -167,16 +162,19 @@ export default function AuthForm() {
           onChange={handleChange}
           className="w-full p-2 border rounded"
         />
+
         <button
           type="submit"
           className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+          style={{ cursor: 'pointer' }}  
         >
           {isSignUp ? "Register" : "Log In"}
         </button>
+
       </form>
       <p className="mt-4 text-center text-sm">
         {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
-        <button onClick={toggleMode} className="text-blue-500 underline">
+        <button onClick={toggleMode} className="text-blue-500 underline" style={{ cursor: 'pointer' }}  >
           {isSignUp ? "Sign In" : "Sign Up"}
         </button>
       </p>
