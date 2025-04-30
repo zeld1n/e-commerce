@@ -35,6 +35,7 @@ public class UserController {
     }
 
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/add")
     public ResponseEntity<UserResponse> createUser(@RequestBody User user) {
 
@@ -66,7 +67,7 @@ public class UserController {
 
 
 
-
+    @CrossOrigin(origins = "http://localhost:3000")
     @PutMapping("/update/{id}")
     public ResponseEntity<User> updateUser(@RequestBody User newUser, @PathVariable int id) {
         Optional<User> optionalUser = userRepository.findById(id);
@@ -99,17 +100,20 @@ public class UserController {
         }
     }
 */
-
-    @GetMapping(path = "/get/{id}")
-    public ResponseEntity<Optional<User>> getUser(@PathVariable int id){
-        Optional<User> user = userRepository.findById(id);
-        if (user.isPresent()) {
+@CrossOrigin(origins = "http://localhost:3000")
+@PostMapping (path = "/login")
+public ResponseEntity<Optional<User>> login(@RequestParam String username,@RequestParam String password) {
+    Optional<User> user = userRepository.findByUsername(username);
+    if (user.isPresent()) {
+        if(user.get().getPassword().equals(passwordEncoder.encode(password)))
             return ResponseEntity.ok(user);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    } else {
+        return ResponseEntity.notFound().build();
     }
+    return ResponseEntity.notFound().build();
+}
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @PutMapping("/updateLocalTime/{id}")
     public ResponseEntity<User> updateLocalTimeUser(@PathVariable int id) {
         Optional<User> optionalUser = userRepository.findById(id);

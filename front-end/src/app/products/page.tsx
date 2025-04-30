@@ -2,7 +2,7 @@ import ProductsPage from '@/pages-content/ProductsPage/ProductsPage';
 import { Product } from '@/types/product';
 
 const fetchProductsFromBackEnd = async (): Promise<Product[]> => {
-  const response = await fetch('http://localhost:8080/product');
+  const response = await fetch('http://localhost:8080/products/all');
   return await response.json();
 };
 

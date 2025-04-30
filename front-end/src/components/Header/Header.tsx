@@ -16,9 +16,12 @@ export const Header = () => {
           <li>
             <Link href={'/reviews'}>Review</Link>
           </li>
-          <Link href={'/login'}>
-            <img src={"/images/logologin.png"} alt="Login" width='30px' height='30px'/>
-          </Link>
+          <li>
+            <Link href={'/authform'}>
+              <img src={"/images/logologin.png"} alt="Login" width={30} height={30} />
+            </Link>
+          </li>
+
         </ul>
       </nav>
     </header>
