@@ -4,5 +4,6 @@ export type Product = {
   price: number;
   quantity:number;
   image: string | null;
+  description: string;
 
 }

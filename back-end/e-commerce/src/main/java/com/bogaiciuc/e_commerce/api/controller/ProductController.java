@@ -2,9 +2,14 @@ package com.bogaiciuc.e_commerce.api.controller;
 import com.bogaiciuc.e_commerce.persistence.entity.Product;
 import com.bogaiciuc.e_commerce.persistence.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.bogaiciuc.e_commerce.api.dto.ProductPageResponse;
 
 import java.util.Optional;
 
@@ -17,13 +22,27 @@ public class ProductController {
     ProductRepository productRepository;
 
     @GetMapping(path = "/all")
-    public @ResponseBody Iterable<Product> getAllProducts() {
-        return productRepository.findAll();
+    public ProductPageResponse getProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "9") int size,
+            @RequestParam(defaultValue = "") String search,
+            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir
+    ) {
+        Sort sort = sortDir.equalsIgnoreCase("desc") ?
+                Sort.by(sortBy).descending() :
+                Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Product> productPage = productRepository.findByNameContainingIgnoreCase(search, pageable);
+
+        return new ProductPageResponse(productPage.getContent(), productPage.getTotalPages());
     }
+
 
     @PostMapping("/add")
     public ResponseEntity<Product> createProduct(@RequestBody Product product) {
-        if (product.getName().isEmpty() || product.getPrice() <= 0 || product.getQuantity() <= 0 || product.getimage().isEmpty()) {
+        if (product.getName().isEmpty() || product.getPrice() <= 0 || product.getQuantity() <= 0 || product.getImage().isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(product);
         } else {
             Product saved = productRepository.save(product);
@@ -32,13 +51,13 @@ public class ProductController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Product> updateProduct(@RequestBody Product newProduct, @PathVariable int id) {
+    public ResponseEntity<Product> updateProduct(@RequestBody Product newProduct, @PathVariable long id) {
         Optional<Product> optionalProduct = productRepository.findById(id);
 
         if (optionalProduct.isPresent()) {
             Product existing = optionalProduct.get();
             existing.setName(newProduct.getName());
-            existing.setImage(newProduct.getimage());
+            existing.setImage(newProduct.getImage());
             existing.setPrice(newProduct.getPrice());
             existing.setQuantity(newProduct.getQuantity());
 
@@ -50,7 +69,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Product> deleteProduct(@PathVariable int id){
+    public ResponseEntity<Product> deleteProduct(@PathVariable long id){
         Optional<Product> optionalProduct = productRepository.findById(id);
         if (optionalProduct.isPresent()) {
             productRepository.delete(optionalProduct.get());
@@ -61,7 +80,7 @@ public class ProductController {
         }
     }
     @GetMapping(path = "/get/{id}")
-    public ResponseEntity<Optional<Product>> getProduct(@PathVariable int id){
+    public ResponseEntity<Optional<Product>> getProduct(@PathVariable long id){
         Optional<Product> product = productRepository.findById(id);
         if(product.isPresent()){
             return ResponseEntity.ok(product);

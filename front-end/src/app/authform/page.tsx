@@ -1,5 +1,6 @@
 'use client';
 import { useState } from "react";
+import { useAuth } from "@/app/context/auth-context"; // путь зависит от структуры
 
 type UserFormData = {
   firstName: string;
@@ -14,8 +15,11 @@ type UserFormData = {
   imageUrl?: string;
 };
 
+
+
 export default function AuthForm() {
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
+  const { setIsLoggedIn } = useAuth();
   const [formData, setFormData] = useState<UserFormData>({
     firstName: "",
     lastName: "",
@@ -61,24 +65,24 @@ export default function AuthForm() {
       : { username: formData.username, password: formData.password };
       console.log("Login payload:", payload);
 
-    try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-  
-      const data = await response.json();
-      if (response.ok) {
-        alert(data.message);
-      } else {
-        alert("Error: " + data.message);
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+    
+        const data = await response.json();
+        if (response.ok) {
+          alert(data.message || "Success");
+          setIsLoggedIn(true);
+        } else {
+          alert("Error: " + (data.message || "Something went wrong"));
+        }
+      } catch (err) {
+        alert("Network error: " + err);
       }
-    } catch (error) {
-      console.error("Network error:", error);
-      alert("Something went wrong!");
-    }
-  };
+    };
   
 
   return (
@@ -180,4 +184,4 @@ export default function AuthForm() {
       </p>
     </div>
   );
-}
+  }

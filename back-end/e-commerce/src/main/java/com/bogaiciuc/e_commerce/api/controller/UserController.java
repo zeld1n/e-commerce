@@ -1,5 +1,6 @@
 package com.bogaiciuc.e_commerce.api.controller;
 
+import com.bogaiciuc.e_commerce.api.dto.LoginRequest;
 import com.bogaiciuc.e_commerce.api.dto.UserResponse;
 import com.bogaiciuc.e_commerce.persistence.repository.UserRepository;
 import org.apache.commons.validator.routines.EmailValidator;
@@ -13,6 +14,7 @@ import com.bogaiciuc.e_commerce.persistence.entity.User;
 
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -60,7 +62,7 @@ public class UserController {
                 user.setPassword(passwordEncoder.encode(user.getPassword()));
                 User saved = userRepository.save(user);
                 UserResponse response = new UserResponse(true, "User created successful", saved);
-                return ResponseEntity.status(HttpStatus.CREATED).body(response);
+                return ResponseEntity.status(HttpStatus.CREATED).body((UserResponse) Map.of("message", "Login successful"));
             }
         }
     }
@@ -101,17 +103,21 @@ public class UserController {
     }
 */
 @CrossOrigin(origins = "http://localhost:3000")
-@PostMapping (path = "/login")
-public ResponseEntity<Optional<User>> login(@RequestParam String username,@RequestParam String password) {
-    Optional<User> user = userRepository.findByUsername(username);
+@PostMapping(path = "/login")
+public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest loginRequest) {
+    Optional<User> user = userRepository.findByUsername(loginRequest.getUsername());
     if (user.isPresent()) {
-        if(user.get().getPassword().equals(passwordEncoder.encode(password)))
-            return ResponseEntity.ok(user);
-    } else {
-        return ResponseEntity.notFound().build();
+        if (passwordEncoder.matches(loginRequest.getPassword(), user.get().getPassword())) {
+            return ResponseEntity
+                    .status(HttpStatus.ACCEPTED)
+                    .body(Map.of("message", "Login successful"));
+        }
     }
-    return ResponseEntity.notFound().build();
+    return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .body(Map.of("message", "Invalid username or password"));
 }
+
 
     @CrossOrigin(origins = "http://localhost:3000")
     @PutMapping("/updateLocalTime/{id}")

@@ -1,35 +1,70 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { Product } from '@/types/product';
+import { useAuth } from "@/app/context/auth-context";
+import { useState, useEffect } from 'react';
 import { ShoppingBagIcon, ShoppingCartIcon, UserCircleIcon, UserIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false); 
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
- 
-  const [cartItems, setCartItems] = useState([
-    { id: 1, name: 'Product 1', price: 20.00, quantity: 1 },
-    { id: 2, name: 'Product 2', price: 30.00, quantity: 2 },
-    { id: 3, name: 'Product 3', price: 40.00, quantity: 1 },
-  ]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const { isLoggedIn } = useAuth();
+
+  const [cartItems, setCartItems] = useState<Product[]>([]);
+
+
+  useEffect(() => {
+    const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    setCartItems(storedCart);
+  }, []);
+
+
+  const handleCartUpdate = () => {
+    const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    setCartItems(storedCart);
+    console.log('Cart refreshed from localStorage:', storedCart);
+  };
+  
+  
 
   const calculateTotal = () => {
     return cartItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
   };
 
+
   const handleLinkClick = () => {
     setIsMenuOpen(false);
   };
 
+ 
   const handleCartToggle = () => {
     setIsCartOpen(!isCartOpen);
   };
 
   const handleCartAndLinkClick = () => {
-    handleCartToggle();  // Открыть/закрыть корзину
-    handleLinkClick();   // Закрыть меню
+    handleCartToggle();  
+    handleLinkClick();
+    handleCartUpdate();   
+  };
+
+  const handleIncreaseQuantity = (id: number) => {
+    const updatedCart = cartItems.map(item =>
+      item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+    );
+    setCartItems(updatedCart);
+    localStorage.setItem('cart', JSON.stringify(updatedCart));  
+  };
+
+
+  const handleDecreaseQuantity = (id: number) => {
+    const updatedCart = cartItems.map(item =>
+      item.id === id && item.quantity > 1
+        ? { ...item, quantity: item.quantity - 1 }
+        : item
+    );
+    setCartItems(updatedCart);
+    localStorage.setItem('cart', JSON.stringify(updatedCart));  
   };
 
   return (
@@ -53,7 +88,7 @@ export const Header = () => {
         </svg>
       </button>
 
-      {/* nvbar */}
+      {/* navbar */}
       <nav>
         <ul
           className={`flex flex-col md:flex-row gap-4 md:gap-6 absolute md:static top-[70px] left-0 w-full md:w-auto bg-sky-950 md:bg-transparent p-4 md:p-0 transition-all duration-300 ease-in-out ${isMenuOpen ? 'block' : 'hidden md:flex'}`}
@@ -91,10 +126,10 @@ export const Header = () => {
               <li>
                 <button
                   className="transition-colors duration-300 ease-in-out hover:bg-gray-700 p-2 rounded flex items-center gap-1 cursor-pointer"
-                  onClick={handleCartAndLinkClick} 
+                  onClick={handleCartAndLinkClick}
                 >
                   <ShoppingCartIcon className="w-5 h-5" />
-                  <span className="hidden md:inline">Cart</span>
+                  <span>Cart</span>
                 </button>
               </li>
               <li>
@@ -104,7 +139,7 @@ export const Header = () => {
                   onClick={handleLinkClick}
                 >
                   <UserCircleIcon className="w-5 h-5" />
-                  <span className="hidden md:inline">Profile</span>
+                  <span>Profile</span>
                 </Link>
               </li>
             </>
@@ -112,7 +147,7 @@ export const Header = () => {
             <li>
               <Link
                 href="/authform"
-                className="transition-colors duration-300 ease-in-out hover:bg-gray-700 p-2 rounded"
+                className="transition-colors duration-300 ease-in-out hover:bg-gray-700 p-2 rounded flex items-center gap-1"
                 onClick={handleLinkClick}
               >
                 Login
@@ -140,7 +175,24 @@ export const Header = () => {
             {cartItems.length > 0 ? (
               cartItems.map(item => (
                 <li key={item.id} className="border-b pb-2">
-                  <p>{item.name} (x{item.quantity})</p>
+                  <div className="flex justify-between items-center">
+                    <p>{item.name} (x{item.quantity})</p>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleDecreaseQuantity(item.id)}
+                        className="text-gray-600 hover:text-gray-900"
+                      >
+                        -
+                      </button>
+                      <span>{item.quantity}</span>
+                      <button
+                        onClick={() => handleIncreaseQuantity(item.id)}
+                        className="text-gray-600 hover:text-gray-900"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
                   <p>€{(item.price * item.quantity).toFixed(2)}</p>
                 </li>
               ))
