@@ -9,35 +9,29 @@ import { ShoppingBagIcon, ShoppingCartIcon, UserCircleIcon, UserIcon, XMarkIcon 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, userData } = useAuth();
 
   const [cartItems, setCartItems] = useState<Product[]>([]);
-
 
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
     setCartItems(storedCart);
   }, []);
 
-
   const handleCartUpdate = () => {
     const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
     setCartItems(storedCart);
     console.log('Cart refreshed from localStorage:', storedCart);
   };
-  
-  
 
   const calculateTotal = () => {
     return cartItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
   };
 
-
   const handleLinkClick = () => {
     setIsMenuOpen(false);
   };
 
- 
   const handleCartToggle = () => {
     setIsCartOpen(!isCartOpen);
   };
@@ -55,7 +49,6 @@ export const Header = () => {
     setCartItems(updatedCart);
     localStorage.setItem('cart', JSON.stringify(updatedCart));  
   };
-
 
   const handleDecreaseQuantity = (id: number) => {
     const updatedCart = cartItems.map(item =>
@@ -142,6 +135,19 @@ export const Header = () => {
                   <span>Profile</span>
                 </Link>
               </li>
+
+              {userData?.role === 'admin' && (
+                <li>
+                  <Link
+                    href="/adminPanel"
+                    className="transition-colors duration-300 ease-in-out hover:bg-gray-700 p-2 rounded flex items-center gap-1"
+                    onClick={handleLinkClick}
+                  >
+                    <UserCircleIcon className="w-5 h-5" />
+                    <span>Admin Panel</span>
+                  </Link>
+                </li>
+              )}
             </>
           ) : (
             <li>
@@ -157,7 +163,7 @@ export const Header = () => {
         </ul>
       </nav>
 
-      {/* Cart Drawer (Side Panel) */}
+      {/*корзинка*/}
       <div
         className={`fixed top-0 right-0 w-[300px] h-full bg-white shadow-lg z-40 transition-all duration-500 ease-in-out transform ${
           isCartOpen ? 'translate-x-0' : 'translate-x-full'

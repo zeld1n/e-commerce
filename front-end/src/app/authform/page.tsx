@@ -1,6 +1,7 @@
 'use client';
 import { useState } from "react";
 import { useAuth } from "@/app/context/auth-context"; // путь зависит от структуры
+import "@/types/user";
 
 type UserFormData = {
   firstName: string;
@@ -19,7 +20,7 @@ type UserFormData = {
 
 export default function AuthForm() {
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
-  const { setIsLoggedIn } = useAuth();
+  const { setIsLoggedIn,setUserData } = useAuth();
   const [formData, setFormData] = useState<UserFormData>({
     firstName: "",
     lastName: "",
@@ -32,6 +33,9 @@ export default function AuthForm() {
     addressCountry: "",
     imageUrl: "",
   });
+
+
+
 
   const toggleMode = () => {
     setIsSignUp(!isSignUp);
@@ -73,16 +77,34 @@ export default function AuthForm() {
         });
     
         const data = await response.json();
-        if (response.ok) {
-          alert(data.message || "Success");
-          setIsLoggedIn(true);
-        } else {
-          alert("Error: " + (data.message || "Something went wrong"));
+      if (response.ok) {
+        alert(data.message || "Success");
+        setIsLoggedIn(true);
+        
+        // Если логин успешный, сохраняем данные пользователя в контексте
+        if (data.username) {
+          const userData: UserData = {
+            username: data.username,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            addressStreet: data.addressStreet,
+            addressZipCode: data.addressZipCode,
+            addressCity: data.addressCity,
+            addressCountry: data.addressCountry,
+            imageUrl: data.imageUrl,
+            lastSeen: data.lastSeen,
+            role: data.role,
+          };
+          setUserData(userData); 
         }
-      } catch (err) {
-        alert("Network error: " + err);
+      } else {
+        alert("Error: " + (data.message || "Something went wrong"));
       }
-    };
+    } catch (err) {
+      alert("Network error: " + err);
+    }
+  };
   
 
   return (

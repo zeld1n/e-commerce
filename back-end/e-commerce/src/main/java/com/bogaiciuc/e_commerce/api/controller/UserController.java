@@ -14,6 +14,7 @@ import com.bogaiciuc.e_commerce.persistence.entity.User;
 
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -90,33 +91,40 @@ public class UserController {
         return ResponseEntity.notFound().build();
     }
 
-/*
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<User> deleteUser(@PathVariable int id){
-        Optional<User> optionalUser = userRepository.findById(id);
-        if (optionalUser.isPresent()) {
-            userRepository.delete(optionalUser.get());
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.notFound().build();
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @PostMapping(path = "/login")
+    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest loginRequest) {
+        Optional<User> user = userRepository.findByUsername(loginRequest.getUsername());
+
+        if (user.isPresent()) {
+            // Проверяем, что пароль совпадает
+            if (passwordEncoder.matches(loginRequest.getPassword(), user.get().getPassword())) {
+                // Создаем карту для ответа
+                Map<String, Object> response = new HashMap<>();
+
+                // Добавляем все данные пользователя в ответ
+                response.put("username", user.get().getUsername());
+                response.put("firstName", user.get().getFirstName());
+                response.put("lastName", user.get().getLastName());
+                response.put("email", user.get().getEmail());
+                response.put("addressStreet", user.get().getAddressStreet());
+                response.put("addressZipCode", user.get().getAddressZipCode());
+                response.put("addressCity", user.get().getAddressCity());
+                response.put("addressCountry", user.get().getAddressCountry());
+                response.put("imageUrl", user.get().getImageUrl());
+                response.put("lastSeen", user.get().getLastSeen());
+                response.put("role", user.get().getRole());  // Роль (например, "user" или "admin")
+
+                // Возвращаем успешный ответ
+                return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+            }
         }
+
+        // Если аутентификация не прошла, возвращаем ошибку
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("message", "Invalid username or password"));
     }
-*/
-@CrossOrigin(origins = "http://localhost:3000")
-@PostMapping(path = "/login")
-public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest loginRequest) {
-    Optional<User> user = userRepository.findByUsername(loginRequest.getUsername());
-    if (user.isPresent()) {
-        if (passwordEncoder.matches(loginRequest.getPassword(), user.get().getPassword())) {
-            return ResponseEntity
-                    .status(HttpStatus.ACCEPTED)
-                    .body(Map.of("message", "Login successful"));
-        }
-    }
-    return ResponseEntity
-            .status(HttpStatus.UNAUTHORIZED)
-            .body(Map.of("message", "Invalid username or password"));
-}
 
 
     @CrossOrigin(origins = "http://localhost:3000")

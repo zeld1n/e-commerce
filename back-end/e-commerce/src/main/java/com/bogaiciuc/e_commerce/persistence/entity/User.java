@@ -1,6 +1,7 @@
 package com.bogaiciuc.e_commerce.persistence.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
 
@@ -40,6 +41,10 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false)
+    @ColumnDefault("user")
+    private String role;
 
 
     public String getUsername() {
@@ -136,5 +141,14 @@ public class User {
 
     public void setLastSeen(LocalDateTime lastSeen) {
         this.lastSeen = lastSeen;
+    }
+
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

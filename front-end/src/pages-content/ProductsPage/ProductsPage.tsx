@@ -52,7 +52,11 @@ export default function ProductsPage() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `http://localhost:8080/products/all?page=${currentPage}&size=${productsPerPage}&search=${encodeURIComponent(searchInput)}&sortBy=${sortBy}&sortDir=${sortDirection}`
+        `http://localhost:8080/products/all?page=${currentPage}&
+        size=${productsPerPage}&
+        search=${encodeURIComponent(searchInput)}&
+        sortBy=${sortBy}&
+        sortDir=${sortDirection}`
       );
       const data: ApiResponse = await res.json();
       setProducts(data.products);
