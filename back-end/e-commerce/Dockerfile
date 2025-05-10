@@ -1,3 +1,4 @@
-FROM openjdk:24-jdk-alpine
-ADD product-app-0.0.1-SNAPSHOT.jar app.jar
+FROM openjdk:17-jdk-alpine
+COPY target/e-commerce-0.0.1-SNAPSHOT.jar app.jar
+EXPOSE 8080
 ENTRYPOINT ["java","-jar","/app.jar"]
