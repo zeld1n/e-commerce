@@ -43,8 +43,9 @@ public class User {
     private String password;
 
     @Column(nullable = false)
-    @ColumnDefault("user")
+    @ColumnDefault("'user'")
     private String role;
+
 
 
     public String getUsername() {

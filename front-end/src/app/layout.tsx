@@ -3,6 +3,7 @@ import { AuthProvider } from "@/app/context/auth-context";
 import { Footer } from '@/components/Footer/Footer';
 import { Header } from '@/components/Header/Header';
 import './global.css';
+import { SessionChecker } from "@/components/SessionChecker/SessionChecker";
 
 
 export const metadata: Metadata = {
@@ -16,6 +17,7 @@ export default function RootLayout(props: Props) {
     <html lang="en">
       <body className="flex flex-col min-h-dvh">
         <AuthProvider>
+        <SessionChecker/>
           <Header />
           <main className="grow p-[20px]">
             {props.children}

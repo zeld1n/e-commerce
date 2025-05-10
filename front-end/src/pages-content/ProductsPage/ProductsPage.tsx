@@ -27,6 +27,9 @@ export default function ProductsPage() {
   const [sortBy, setSortBy] = useState('name');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [isLoading, setIsLoading] = useState(false);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
+
 
   const productsPerPage = 9;
   const router = useRouter();  
@@ -52,12 +55,14 @@ export default function ProductsPage() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `http://localhost:8080/products/all?page=${currentPage}&
-        size=${productsPerPage}&
-        search=${encodeURIComponent(searchInput)}&
-        sortBy=${sortBy}&
-        sortDir=${sortDirection}`
+        `http://localhost:8080/products/all?page=${currentPage}&` +
+        `size=${productsPerPage}&` +
+        `search=${encodeURIComponent(searchInput)}&` +
+        `sortBy=${sortBy}&` +
+        `sortDir=${sortDirection}&` +
+        `category=${encodeURIComponent(selectedCategory)}`
       );
+
       const data: ApiResponse = await res.json();
       setProducts(data.products);
       setTotalPages(data.totalPages);
@@ -69,8 +74,24 @@ export default function ProductsPage() {
   };
 
   useEffect(() => {
-    fetchProducts();
-  }, [currentPage, searchInput, sortBy, sortDirection]);
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch('http://localhost:8080/categories'); 
+      const data = await res.json();
+      setCategories(data); 
+    } catch (err) {
+      console.error('Failed to load categories:', err);
+    }
+  };
+
+  fetchCategories();
+}, []);
+
+
+useEffect(() => {
+  fetchProducts();
+}, [currentPage, searchInput, sortBy, sortDirection, selectedCategory]);
+
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchInput(e.target.value);
@@ -150,6 +171,21 @@ export default function ProductsPage() {
               <option value="asc">Ascending</option>
               <option value="desc">Descending</option>
             </select>
+          </div>
+          <div>
+            <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="border px-2 py-1 rounded"
+              >
+                <option value="">All</option>
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                  </option>
+                ))}
+              </select>
+
           </div>
         </div>
       </div>

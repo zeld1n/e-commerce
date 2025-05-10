@@ -27,17 +27,26 @@ public class ProductController {
             @RequestParam(defaultValue = "9") int size,
             @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "name") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDir
+            @RequestParam(defaultValue = "asc") String sortDir,
+            @RequestParam(required = false) String category
     ) {
         Sort sort = sortDir.equalsIgnoreCase("desc") ?
                 Sort.by(sortBy).descending() :
                 Sort.by(sortBy).ascending();
 
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Product> productPage = productRepository.findByNameContainingIgnoreCase(search, pageable);
+
+        Page<Product> productPage;
+
+        if (category != null && !category.isBlank()) {
+            productPage = productRepository.findByNameContainingIgnoreCaseAndCategoryNameIgnoreCase(search, category, pageable);
+        } else {
+            productPage = productRepository.findByNameContainingIgnoreCase(search, pageable);
+        }
 
         return new ProductPageResponse(productPage.getContent(), productPage.getTotalPages());
     }
+
 
 
     @PostMapping("/add")

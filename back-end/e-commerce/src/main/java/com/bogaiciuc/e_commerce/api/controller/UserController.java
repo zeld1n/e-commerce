@@ -3,16 +3,18 @@ package com.bogaiciuc.e_commerce.api.controller;
 import com.bogaiciuc.e_commerce.api.dto.LoginRequest;
 import com.bogaiciuc.e_commerce.api.dto.UserResponse;
 import com.bogaiciuc.e_commerce.persistence.repository.UserRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import com.bogaiciuc.e_commerce.persistence.entity.User;
 
 
-
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -70,6 +72,39 @@ public class UserController {
 
 
 
+        @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+        @GetMapping("/check_session")
+        public ResponseEntity<?> checkSession(@CookieValue(value = "session", required = true) String session) {
+            if (session == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "No session found"));
+            }
+
+            Optional<User> user = userRepository.findByUsername(session);
+            if (user.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Invalid session"));
+            }
+
+            return ResponseEntity.ok(user.get());
+        }
+
+
+        @PostMapping("/logout")
+        public ResponseEntity<?> logout(HttpServletResponse response) {
+            ResponseCookie cookie = ResponseCookie.from("session", "")
+                    .httpOnly(true)
+                    .path("/")
+                    .maxAge(0)
+                    .build();
+
+            response.setHeader("Set-Cookie", cookie.toString());
+
+            return ResponseEntity.ok().build();
+        }
+
+
+
+
+
     @CrossOrigin(origins = "http://localhost:3000")
     @PutMapping("/update/{id}")
     public ResponseEntity<User> updateUser(@RequestBody User newUser, @PathVariable int id) {
@@ -92,39 +127,49 @@ public class UserController {
     }
 
 
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
     @PostMapping(path = "/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<Map<String, Object>> login(
+            @RequestBody LoginRequest loginRequest,
+            HttpServletResponse response
+    ) {
         Optional<User> user = userRepository.findByUsername(loginRequest.getUsername());
 
-        if (user.isPresent()) {
-            // Проверяем, что пароль совпадает
-            if (passwordEncoder.matches(loginRequest.getPassword(), user.get().getPassword())) {
-                // Создаем карту для ответа
-                Map<String, Object> response = new HashMap<>();
+        if (user.isPresent() && passwordEncoder.matches(loginRequest.getPassword(), user.get().getPassword())) {
+            Map<String, Object> responseBody = new HashMap<>();
+            User u = user.get();
 
-                // Добавляем все данные пользователя в ответ
-                response.put("username", user.get().getUsername());
-                response.put("firstName", user.get().getFirstName());
-                response.put("lastName", user.get().getLastName());
-                response.put("email", user.get().getEmail());
-                response.put("addressStreet", user.get().getAddressStreet());
-                response.put("addressZipCode", user.get().getAddressZipCode());
-                response.put("addressCity", user.get().getAddressCity());
-                response.put("addressCountry", user.get().getAddressCountry());
-                response.put("imageUrl", user.get().getImageUrl());
-                response.put("lastSeen", user.get().getLastSeen());
-                response.put("role", user.get().getRole());  // Роль (например, "user" или "admin")
+            // Добавляем user-данные
+            responseBody.put("username", u.getUsername());
+            responseBody.put("firstName", u.getFirstName());
+            responseBody.put("lastName", u.getLastName());
+            responseBody.put("email", u.getEmail());
+            responseBody.put("addressStreet", u.getAddressStreet());
+            responseBody.put("addressZipCode", u.getAddressZipCode());
+            responseBody.put("addressCity", u.getAddressCity());
+            responseBody.put("addressCountry", u.getAddressCountry());
+            responseBody.put("imageUrl", u.getImageUrl());
+            responseBody.put("lastSeen", u.getLastSeen());
+            responseBody.put("role", u.getRole());
 
-                // Возвращаем успешный ответ
-                return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
-            }
+            // 🍪 Устанавливаем cookie
+            ResponseCookie cookie = ResponseCookie.from("session", u.getRole())
+                    .httpOnly(true)
+                    .secure(false) // в проде нужно true
+                    .path("/")
+                    .maxAge(10000)
+                    .sameSite("Lax")
+                    .build();
+
+            response.setHeader("Set-Cookie", cookie.toString());
+
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(responseBody);
         }
 
-        // Если аутентификация не прошла, возвращаем ошибку
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(Map.of("message", "Invalid username or password"));
     }
+
 
 
     @CrossOrigin(origins = "http://localhost:3000")

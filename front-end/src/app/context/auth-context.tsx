@@ -7,21 +7,40 @@ type AuthContextType = {
   isLoggedIn: boolean;
   setIsLoggedIn: (value: boolean) => void;
   userData: UserData | null;
-  setUserData: (userData: UserData) => void;
+  setUserData: (userData: UserData | null) => void;
+  logout: () => void; 
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);  // По умолчанию не залогинен
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [userData, setUserData] = useState<UserData | null>(null);
 
+  const logout = async () => {
+    try {
+      await fetch("http://localhost:8080/users/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+
+    setIsLoggedIn(false);
+    setUserData(null);
+    localStorage.removeItem("cart"); // Очистка корзины (если нужно)
+  };
+
   return (
-    <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, userData, setUserData }}>
+    <AuthContext.Provider
+      value={{ isLoggedIn, setIsLoggedIn, userData, setUserData, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
+
 
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);

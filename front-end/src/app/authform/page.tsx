@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useAuth } from "@/app/context/auth-context"; // путь зависит от структуры
 import "@/types/user";
+import { useRouter } from 'next/navigation';
 
 type UserFormData = {
   firstName: string;
@@ -56,6 +57,8 @@ export default function AuthForm() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+  
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -74,14 +77,13 @@ export default function AuthForm() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
+          credentials: "include",
         });
     
         const data = await response.json();
       if (response.ok) {
-        alert(data.message || "Success");
         setIsLoggedIn(true);
-        
-        // Если логин успешный, сохраняем данные пользователя в контексте
+        router.push('/homepage');
         if (data.username) {
           const userData: UserData = {
             username: data.username,
@@ -100,6 +102,7 @@ export default function AuthForm() {
         }
       } else {
         alert("Error: " + (data.message || "Something went wrong"));
+        
       }
     } catch (err) {
       alert("Network error: " + err);
@@ -113,91 +116,103 @@ export default function AuthForm() {
         {isSignUp ? "Sign Up" : "Sign In"}
       </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
-        {isSignUp && (
-          <>
-            <input
-              name="firstName"
-              placeholder="First Name"
-              required
-              onChange={handleChange}
-              className="w-full p-2 border rounded"
-            />
-            <input
-              name="lastName"
-              placeholder="Last Name"
-              required
-              onChange={handleChange}
-              className="w-full p-2 border rounded"
-            />
-            <input
-              name="email"
-              placeholder="Email"
-              type="email"
-              required
-              onChange={handleChange}
-              className="w-full p-2 border rounded"
-            />
-            <input
-              name="addressStreet"
-              placeholder="Street"
-              required
-              onChange={handleChange}
-              className="w-full p-2 border rounded"
-            />
-            <input
-              name="addressZipCode"
-              placeholder="ZIP Code"
-              required
-              onChange={handleChange}
-              className="w-full p-2 border rounded"
-            />
-            <input
-              name="addressCity"
-              placeholder="City"
-              required
-              onChange={handleChange}
-              className="w-full p-2 border rounded"
-            />
-            <input
-              name="addressCountry"
-              placeholder="Country"
-              required
-              onChange={handleChange}
-              className="w-full p-2 border rounded"
-            />
-            <input
-              name="imageUrl"
-              placeholder="Image URL (optional)"
-              onChange={handleChange}
-              className="w-full p-2 border rounded"
-            />
-          </>
-        )}
-        <input
-          name="username"
-          placeholder="Username"
-          required
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          required
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
+      {isSignUp && (
+        <>
+          <input
+            name="firstName"
+            placeholder="First Name"
+            required
+            value={formData.firstName}
+            onChange={handleChange}
+            className="w-full p-2 border rounded"
+          />
+          <input
+            name="lastName"
+            placeholder="Last Name"
+            required
+            value={formData.lastName}
+            onChange={handleChange}
+            className="w-full p-2 border rounded"
+          />
+          <input
+            name="email"
+            placeholder="Email"
+            type="email"
+            required
+            value={formData.email}
+            onChange={handleChange}
+            className="w-full p-2 border rounded"
+          />
+          <input
+            name="addressStreet"
+            placeholder="Street"
+            required
+            value={formData.addressStreet}
+            onChange={handleChange}
+            className="w-full p-2 border rounded"
+          />
+          <input
+            name="addressZipCode"
+            placeholder="ZIP Code"
+            required
+            value={formData.addressZipCode}
+            onChange={handleChange}
+            className="w-full p-2 border rounded"
+          />
+          <input
+            name="addressCity"
+            placeholder="City"
+            required
+            value={formData.addressCity}
+            onChange={handleChange}
+            className="w-full p-2 border rounded"
+          />
+          <input
+            name="addressCountry"
+            placeholder="Country"
+            required
+            value={formData.addressCountry}
+            onChange={handleChange}
+            className="w-full p-2 border rounded"
+          />
+          <input
+            name="imageUrl"
+            placeholder="Image URL (optional)"
+            value={formData.imageUrl}
+            onChange={handleChange}
+            className="w-full p-2 border rounded"
+          />
+        </>
+      )}
 
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
-          style={{ cursor: 'pointer' }}  
-        >
-          {isSignUp ? "Register" : "Log In"}
-        </button>
+      <input
+        name="username"
+        placeholder="Username"
+        required
+        value={formData.username}
+        onChange={handleChange}
+        className="w-full p-2 border rounded"
+      />
+      <input
+        type="password"
+        name="password"
+        placeholder="Password"
+        required
+        value={formData.password}
+        onChange={handleChange}
+        className="w-full p-2 border rounded"
+      />
 
-      </form>
+      <button
+        type="submit"
+        className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+        style={{ cursor: 'pointer' }}
+      >
+        {isSignUp ? "Register" : "Log In"}
+      </button>
+    </form>
+
+
       <p className="mt-4 text-center text-sm">
         {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
         <button onClick={toggleMode} className="text-blue-500 underline" style={{ cursor: 'pointer' }}  >

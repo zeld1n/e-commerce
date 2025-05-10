@@ -9,7 +9,8 @@ import { ShoppingBagIcon, ShoppingCartIcon, UserCircleIcon, UserIcon, XMarkIcon 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const { isLoggedIn, userData } = useAuth();
+  const { isLoggedIn, userData, logout} = useAuth();
+
 
   const [cartItems, setCartItems] = useState<Product[]>([]);
 
@@ -104,15 +105,6 @@ export const Header = () => {
               <UserIcon className="w-5 h-5" /> About Us
             </Link>
           </li>
-          <li className="flex items-center">
-            <Link
-              href="/reviews"
-              className="transition-colors duration-300 ease-in-out hover:bg-gray-700 p-2 rounded flex items-center"
-              onClick={handleLinkClick}
-            >
-              Review
-            </Link>
-          </li>
 
           {isLoggedIn ? (
             <>
@@ -125,6 +117,19 @@ export const Header = () => {
                   <span>Cart</span>
                 </button>
               </li>
+              <li>
+                <button
+                  onClick={() => {
+                    logout();
+                    handleLinkClick(); 
+                  }}
+                  className="transition-colors duration-300 ease-in-out hover:bg-gray-700 p-2 rounded flex items-center gap-1 cursor-pointer"
+                >
+                  <XMarkIcon className="w-5 h-5"/>
+                  Logout
+                </button>
+              </li>
+
               <li>
                 <Link
                   href="/profile"
