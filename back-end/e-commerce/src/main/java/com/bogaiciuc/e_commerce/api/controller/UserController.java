@@ -63,9 +63,10 @@ public class UserController {
             } else {
                 user.setLastSeen(LocalDateTime.now());
                 user.setPassword(passwordEncoder.encode(user.getPassword()));
+                user.setRole("user");
                 User saved = userRepository.save(user);
                 UserResponse response = new UserResponse(true, "User created successful", saved);
-                return ResponseEntity.status(HttpStatus.CREATED).body((UserResponse) Map.of("message", "Login successful"));
+                return ResponseEntity.status(HttpStatus.CREATED).body(response);
             }
         }
     }

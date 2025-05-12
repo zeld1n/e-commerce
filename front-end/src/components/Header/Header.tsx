@@ -213,9 +213,12 @@ export const Header = () => {
           </ul>
           <div className="mt-4">
             <p className="font-semibold text-gray-900">Total: €{calculateTotal()}</p>
-            <button className="w-full mt-4 bg-blue-600 text-white p-2 rounded hover:bg-blue-700 cursor-pointer">
-              Checkout
-            </button>
+            <Link href="/checkout">
+              <button className="w-full mt-4 bg-blue-600 text-white p-2 rounded hover:bg-blue-700 cursor-pointer">
+                Checkout
+              </button>
+            </Link>
+
           </div>
         </div>
       </div>

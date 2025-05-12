@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 public class User {
@@ -45,6 +46,12 @@ public class User {
     @Column(nullable = false)
     @ColumnDefault("'user'")
     private String role;
+
+    @OneToMany(mappedBy = "user")
+    private List<Order> orders;
+
+
+
 
 
 
