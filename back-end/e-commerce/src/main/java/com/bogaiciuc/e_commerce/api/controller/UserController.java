@@ -128,6 +128,19 @@ public class UserController {
     }
 
 
+    @CrossOrigin(origins = "http://localhost:3000")
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable int id) {
+        Optional<User> optionalUser = userRepository.findById(id);
+        if (optionalUser.isPresent()) {
+            userRepository.delete(optionalUser.get());
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
     @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
     @PostMapping(path = "/login")
     public ResponseEntity<Map<String, Object>> login(

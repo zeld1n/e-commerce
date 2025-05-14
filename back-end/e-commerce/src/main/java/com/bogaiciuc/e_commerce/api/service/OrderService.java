@@ -4,6 +4,7 @@ package com.bogaiciuc.e_commerce.api.service;
 import com.bogaiciuc.e_commerce.persistence.entity.*;
 import com.bogaiciuc.e_commerce.persistence.repository.OrderRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +20,9 @@ public class OrderService {
         this.orderRepository = orderRepository;
         this.cartService = cartService;
     }
+
+
+
 
     public Order createOrderFromCart(User user) {
         Cart cart = cartService.getOrCreateCart(user);

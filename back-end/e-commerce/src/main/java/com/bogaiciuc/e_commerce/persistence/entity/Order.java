@@ -1,4 +1,6 @@
 package com.bogaiciuc.e_commerce.persistence.entity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,9 +21,11 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<OrderItem> items;
 
     public Long getId() {

@@ -1,7 +1,7 @@
 "use client"
 import Link from 'next/link';
 
-import { useState } from "react"
+import { useState,useEffect } from "react"
 import { BarChart3, Box, LayoutDashboard, Package, Settings, ShoppingCart, Users } from "lucide-react"
 import { Button } from "@/components/adminPanel/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/adminPanel/ui/card"
@@ -14,6 +14,34 @@ import { MobileNav } from "@/components/adminPanel/mobile-nav"
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview")
+
+  const [totalAmount, setTotalAmount] = useState(0);
+
+  useEffect(() => {
+    const fetchTotalAmount = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/orders/total_amount");
+        if (!response.ok) {
+          throw new Error("Failed to fetch total amount");
+        }
+        const data = await response.json();
+        setTotalAmount(data); 
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      }
+    };
+
+    fetchTotalAmount();
+  }, []);
+
+
+
+
+
+  
+
+
+
 
   return (
     <div className="flex min-h-screen w-full flex-col">
@@ -112,8 +140,7 @@ export default function Dashboard() {
                       </svg>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-2xl font-bold">$45,231.89</div>
-                      <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+                      <div className="text-2xl font-bold">${totalAmount}</div>
                     </CardContent>
                   </Card>
                   <Card>
@@ -238,4 +265,6 @@ export default function Dashboard() {
       </div>
     </div>
   )
+
 }
+

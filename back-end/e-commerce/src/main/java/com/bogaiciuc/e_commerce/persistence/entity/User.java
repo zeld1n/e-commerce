@@ -1,5 +1,6 @@
 package com.bogaiciuc.e_commerce.persistence.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -37,6 +38,9 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime lastSeen;
 
+
+    private long spent;
+
     @Column(unique = true,nullable = false)
     private String username;
 
@@ -48,12 +52,20 @@ public class User {
     private String role;
 
     @OneToMany(mappedBy = "user")
+    @JsonManagedReference
     private List<Order> orders;
 
+    private int numOrders;
 
 
 
+    public int getNumOrders() {
+        return numOrders;
+    }
 
+    public void setNumOrders(int numOrders) {
+        this.numOrders = numOrders;
+    }
 
     public String getUsername() {
         return username;
@@ -69,6 +81,23 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+
+    public long getSpent() {
+        return spent;
+    }
+
+    public void setSpent(long spent) {
+        this.spent = spent;
+    }
+
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
     }
 
     public Long getId() {

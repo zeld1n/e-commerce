@@ -1,7 +1,7 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { ArrowUpDown, MoreHorizontal, Plus, Search } from "lucide-react"
+import { useEffect, useState } from "react"
+import { ArrowUpDown, MoreHorizontal,  Search } from "lucide-react"
 
 import { Button } from "@/components/adminPanel/ui/button"
 import { Card } from "@/components/adminPanel/ui/card"
@@ -18,110 +18,87 @@ import { Input } from "@/components/adminPanel/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/adminPanel/ui/table"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/adminPanel/ui/avatar"
 
-const customers = [
-  {
-    id: "CUST-1001",
-    name: "John Doe",
-    email: "john.doe@example.com",
-    orders: 5,
-    spent: 349.95,
-    lastOrder: "2023-05-15",
-    status: "Active",
-  },
-  {
-    id: "CUST-1002",
-    name: "Alice Smith",
-    email: "alice.smith@example.com",
-    orders: 3,
-    spent: 129.85,
-    lastOrder: "2023-05-10",
-    status: "Active",
-  },
-  {
-    id: "CUST-1003",
-    name: "Robert Johnson",
-    email: "robert.j@example.com",
-    orders: 8,
-    spent: 599.92,
-    lastOrder: "2023-05-18",
-    status: "Active",
-  },
-  {
-    id: "CUST-1004",
-    name: "Emily Brown",
-    email: "emily.brown@example.com",
-    orders: 2,
-    spent: 79.98,
-    lastOrder: "2023-04-25",
-    status: "Inactive",
-  },
-  {
-    id: "CUST-1005",
-    name: "Michael Wilson",
-    email: "m.wilson@example.com",
-    orders: 6,
-    spent: 429.94,
-    lastOrder: "2023-05-12",
-    status: "Active",
-  },
-  {
-    id: "CUST-1006",
-    name: "Sarah Davis",
-    email: "sarah.davis@example.com",
-    orders: 1,
-    spent: 59.99,
-    lastOrder: "2023-03-20",
-    status: "Inactive",
-  },
-  {
-    id: "CUST-1007",
-    name: "David Miller",
-    email: "david.m@example.com",
-    orders: 4,
-    spent: 249.96,
-    lastOrder: "2023-05-05",
-    status: "Active",
-  },
-  {
-    id: "CUST-1008",
-    name: "Jennifer Taylor",
-    email: "j.taylor@example.com",
-    orders: 3,
-    spent: 189.97,
-    lastOrder: "2023-04-30",
-    status: "Active",
-  },
-  {
-    id: "CUST-1009",
-    name: "James Anderson",
-    email: "james.a@example.com",
-    orders: 7,
-    spent: 519.93,
-    lastOrder: "2023-05-17",
-    status: "Active",
-  },
-  {
-    id: "CUST-1010",
-    name: "Lisa Thomas",
-    email: "lisa.t@example.com",
-    orders: 2,
-    spent: 99.98,
-    lastOrder: "2023-04-10",
-    status: "Inactive",
-  },
-]
+type Customer = {
+  id: number
+  firstName: string
+  lastName: string
+  email: string
+  imageUrl: string
+  spent: number
+  numOrders: number
+  lastSeen: string
+  role: string
+}
+
+
+
 
 export function CustomerList() {
-  const [selectedCustomers, setSelectedCustomers] = useState<string[]>([])
+  const [customers, setCustomers] = useState<Customer[]>([])
+  const [selectedCustomers, setSelectedCustomers] = useState<number[]>([])
 
-  const toggleCustomer = (customerId: string) => {
+
+
+  const [searchTerm, setSearchTerm] = useState("")
+
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
+
+  const filteredCustomers = customers.filter((customer) =>
+    `${customer.firstName} ${customer.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    customer.email.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
+  const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage)
+  const paginatedCustomers = filteredCustomers.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  )
+
+
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const res = await fetch('http://localhost:8080/users/all')
+        const data = await res.json()
+        setCustomers(data)
+      } catch (err) {
+        console.error('Failed to load customers:', err)
+      }
+    }
+
+    fetchCustomers()
+  }, [])
+
+
+  const deleteCustomer = async (customerId: number) => {
+  try {
+    const res = await fetch(`http://localhost:8080/users/delete/${customerId}`, {
+      method: 'DELETE',
+    })
+
+    if (!res.ok) {
+      throw new Error('Failed to delete customer')
+    }
+
+    setCustomers((prev) => prev.filter((customer) => customer.id !== customerId))
+  } catch (err) {
+    console.error('Error deleting customer:', err)
+  }
+}
+
+
+  const toggleCustomer = (customerId: number) => {
     setSelectedCustomers((prev) =>
-      prev.includes(customerId) ? prev.filter((id) => id !== customerId) : [...prev, customerId],
+      prev.includes(customerId) ? prev.filter((id) => id !== customerId) : [...prev, customerId]
     )
   }
 
+
   const toggleAll = () => {
-    setSelectedCustomers((prev) => (prev.length === customers.length ? [] : customers.map((customer) => customer.id)))
+    setSelectedCustomers((prev) =>
+      prev.length === customers.length ? [] : customers.map((customer) => customer.id)
+    )
   }
 
   return (
@@ -131,16 +108,21 @@ export function CustomerList() {
           <h2 className="text-2xl font-bold tracking-tight">Customers</h2>
           <p className="text-muted-foreground">Manage your customer database</p>
         </div>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" /> Add Customer
-        </Button>
       </div>
+
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input type="search" placeholder="Search customers..." className="pl-8 w-full md:w-[300px] lg:w-[400px]" />
+          <Input
+          type="search"
+          placeholder="Search customers..."
+          className="pl-8 w-full md:w-[300px] lg:w-[400px]"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
         </div>
       </div>
+
       <Card>
         <Table>
           <TableHeader>
@@ -160,72 +142,113 @@ export function CustomerList() {
               </TableHead>
               <TableHead className="text-right">Orders</TableHead>
               <TableHead className="text-right">Total Spent</TableHead>
-              <TableHead>Last Order</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>Last Seen</TableHead>
+              <TableHead>Role</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {customers.map((customer) => (
-              <TableRow key={customer.id}>
+            {paginatedCustomers.map((customer) => (
+            <TableRow key={customer.id}>
                 <TableCell>
-                  <Checkbox
-                    checked={selectedCustomers.includes(customer.id)}
-                    onCheckedChange={() => toggleCustomer(customer.id)}
-                  />
-                </TableCell>
-                <TableCell className="font-medium">{customer.id}</TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <Avatar>
-                      <AvatarImage src="/placeholder.svg?height=32&width=32" alt={customer.name} />
-                      <AvatarFallback>
-                        {customer.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <div className="font-medium">{customer.name}</div>
-                      <div className="text-sm text-muted-foreground">{customer.email}</div>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell className="text-right">{customer.orders}</TableCell>
-                <TableCell className="text-right">${customer.spent.toFixed(2)}</TableCell>
-                <TableCell>{customer.lastOrder}</TableCell>
-                <TableCell>
-                  <div
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                      customer.status === "Active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    {customer.status}
-                  </div>
-                </TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Open menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem>View profile</DropdownMenuItem>
-                      <DropdownMenuItem>View orders</DropdownMenuItem>
-                      <DropdownMenuItem>Edit details</DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-red-600">Delete customer</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
+                 <Checkbox
+                     checked={selectedCustomers.includes(customer.id)}
+                     onCheckedChange={() => toggleCustomer(customer.id)}
+                />
+              </TableCell>
+
+      <TableCell className="font-medium">{customer.id}</TableCell>
+
+      <TableCell>
+        <div className="flex items-center gap-3">
+          <Avatar>
+            <AvatarImage src={customer.imageUrl || "/placeholder.svg?height=32&width=32"} alt={`${customer.firstName} ${customer.lastName}`} />
+            <AvatarFallback>
+              {[customer.firstName, customer.lastName].filter(Boolean).map((n) => n[0]).join("")}
+            </AvatarFallback>
+          </Avatar>
+          <div>
+            <div className="font-medium">{customer.firstName} {customer.lastName}</div>
+            <div className="text-sm text-muted-foreground">{customer.email}</div>
+          </div>
+        </div>
+      </TableCell>
+
+      <TableCell className="text-right">{customer.numOrders}</TableCell>
+      <TableCell className="text-right">${customer.spent.toFixed(2)}</TableCell>
+      <TableCell>{new Date(customer.lastSeen).toLocaleString()}</TableCell>
+
+      <TableCell>
+        <div className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+          customer.role === "admin"
+            ? "bg-blue-100 text-blue-800"
+            : "bg-green-100 text-green-800"
+        }`}>
+          {customer.role}
+        </div>
+      </TableCell>
+
+      <TableCell className="text-right">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal className="h-4 w-4 " />
+            </Button>
+          </DropdownMenuTrigger >
+          <DropdownMenuContent className="bg-white" align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem>View profile</DropdownMenuItem>
+            <DropdownMenuItem>View orders</DropdownMenuItem>
+            <DropdownMenuItem>Edit details</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="text-red-600 cursor-pointer"
+              onClick={() => deleteCustomer(customer.id)}
+            >
+              Delete customer
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </TableCell>
+    </TableRow>
+  ))}
+</TableBody>
         </Table>
+        <div className="flex justify-center mt-4 gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            >
+              Prev
+            </Button>
+
+            {[...Array(totalPages)].map((_, index) => {
+              const page = index + 1
+              return (
+                <Button
+                  key={page}
+                  variant={currentPage === page ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setCurrentPage(page)}
+                >
+                  {page}
+                </Button>
+              )
+            })}
+
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            >
+              Next
+            </Button>
+          </div>
+
       </Card>
     </div>
   )

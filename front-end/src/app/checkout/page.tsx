@@ -41,7 +41,7 @@ export default function CheckoutPage() {
   };
   
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const shipping = 5.99;
+  const shipping = 4.99;
   const total = subtotal + shipping;
   
   const handleSubmit = (e) => {
@@ -52,18 +52,10 @@ export default function CheckoutPage() {
   return (
     
     <div className="flex flex-col min-h-screen bg-sky-950 text-white">
-      {/* Header */}
-      <header className="py-4 px-6 border-b border-sky-800">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold"></h1>
-          <div className="flex items-center space-x-2">
-            <span className="font-semibold">Checkout</span>
-          </div>
-        </div>
-      </header>
+
 
       {/* Main Content */}
-      <main className="flex-grow py-8">
+      <main className="flex-grow py-8 bg-sky-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:grid lg:grid-cols-12 lg:gap-8">
           {/* Checkout Form */}
           <div className="lg:col-span-8">
@@ -289,13 +281,6 @@ export default function CheckoutPage() {
           </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="py-6 px-6 border-t border-sky-800">
-        <div className="max-w-7xl mx-auto text-center text-sky-400 text-sm">
-          <p>© 2025 NegozioItaliano. Tutti i diritti riservati.</p>
-        </div>
-      </footer>
     </div>
   );
 }
