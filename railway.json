@@ -2,11 +2,29 @@
   "builds": [
     {
       "src": "front-end",
-      "use": "@railway/next"
+      "use": "@railway/railpack-nixpacks"
     },
     {
       "src": "back-end",
-      "use": "@railway/springboot"
+      "use": "@railway/railpack-nixpacks"
+    },
+    {
+      "src": "db",
+      "use": "@railway/railpack-nixpacks"
+    }
+  ],
+  "deploys": [
+    {
+      "src": "front-end",
+      "use": "@railway/railpack-nixpacks"
+    },
+    {
+      "src": "back-end",
+      "use": "@railway/railpack-nixpacks"
+    },
+    {
+      "src": "db",
+      "use": "@railway/railpack-nixpacks"
     }
   ]
 }
