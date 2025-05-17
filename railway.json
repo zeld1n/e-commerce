@@ -1,0 +1,12 @@
+{
+  "builds": [
+    {
+      "src": "front-end",
+      "use": "@railway/next"
+    },
+    {
+      "src": "back-end",
+      "use": "@railway/springboot"
+    }
+  ]
+}
