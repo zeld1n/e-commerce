@@ -214,7 +214,7 @@ export function ProductList() {
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent className="bg-white" align="end">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
                       <DropdownMenuItem>Edit product</DropdownMenuItem>
                       <DropdownMenuItem>View details</DropdownMenuItem>
