@@ -16,14 +16,14 @@ public class OrderController {
     OrderRepository orderRepository;
 
 
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin(origins = "https://e-commerce-six-rho.vercel.app")
     @GetMapping("/all")
     public Page<Order> getAllOrders(Pageable pageable) {
         return orderRepository.findAll(pageable);
     }
 
 
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin(origins = "https://e-commerce-six-rho.vercel.app")
     @GetMapping("/total_amount")
     public ResponseEntity<Double> getTotal_amount(Order order) {
         return ResponseEntity.status(200).body(orderRepository.getTotalAmount());

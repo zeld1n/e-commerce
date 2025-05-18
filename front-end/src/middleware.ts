@@ -5,9 +5,12 @@ export function middleware(request: NextRequest) {
   const isAdminRoute = url.pathname.startsWith('/adminPanel');
 
   const userRole = request.cookies.get('session')?.value;
-  console.log('MIDDLEWARE: role =', userRole);
+  const csrfToken = request.cookies.get('csrfToken')?.value;  // пример, если нужен csrf
 
-  if (isAdminRoute && (userRole !== 'admin')) {
+  console.log('MIDDLEWARE: role =', userRole);
+  console.log('MIDDLEWARE: csrfToken =', csrfToken);
+
+  if (isAdminRoute && userRole !== 'admin') {
     return NextResponse.redirect(new URL('/homepage', request.url));
   }
 
