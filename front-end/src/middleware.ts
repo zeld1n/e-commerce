@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+/*import { NextRequest, NextResponse } from 'next/server';
 
 export function middleware(request: NextRequest) {
   const url = request.nextUrl;
-  const isAdminRoute = url.pathname.startsWith('/adminPanel');
+  const isAdminRoute = url.pathname.startsWith('*//*adminPanel');
 
   const userRole = request.cookies.get('session')?.value;
   const csrfToken = request.cookies.get('csrfToken')?.value;  // пример, если нужен csrf
@@ -18,5 +18,6 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/adminPanel/:path*'],
+  matcher: ['*//*adminPanel/:path*'],
 };
+*/
