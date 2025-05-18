@@ -51,27 +51,6 @@ export default function ProductsPage() {
   };
   
 
-  const fetchProducts = async () => {
-    setIsLoading(true);
-    try {
-      const res = await fetch(
-        `https://demo-deploy-gs0s.onrender.com/products/all?page=${currentPage}&` +
-        `size=${productsPerPage}&` +
-        `search=${encodeURIComponent(searchInput)}&` +
-        `sortBy=${sortBy}&` +
-        `sortDir=${sortDirection}&` +
-        `category=${encodeURIComponent(selectedCategory)}`
-      );
-
-      const data: ApiResponse = await res.json();
-      setProducts(data.products);
-      setTotalPages(data.totalPages);
-    } catch (err) {
-      console.error('Failed to load products:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   useEffect(() => {
   const fetchCategories = async () => {
@@ -89,8 +68,30 @@ export default function ProductsPage() {
 
 
 useEffect(() => {
+  const fetchProducts = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch(
+        `https://demo-deploy-gs0s.onrender.com/products/all?page=${currentPage}&` +
+        `size=${productsPerPage}&` +
+        `search=${encodeURIComponent(searchInput)}&` +
+        `sortBy=${sortBy}&` +
+        `sortDir=${sortDirection}&` +
+        `category=${encodeURIComponent(selectedCategory)}`
+      );
+      const data: ApiResponse = await res.json();
+      setProducts(data.products);
+      setTotalPages(data.totalPages);
+    } catch (err) {
+      console.error('Failed to load products:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   fetchProducts();
-}, [currentPage, searchInput, sortBy, sortDirection, selectedCategory]);
+}, [currentPage, productsPerPage, searchInput, sortBy, sortDirection, selectedCategory]);
+
 
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {

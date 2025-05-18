@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Product } from '@/types/product';
+import Image from 'next/image';
 
 const ProductDetails = () => {
   const [product, setProduct] = useState<Product | null>(null);
@@ -62,7 +63,7 @@ const ProductDetails = () => {
       <h1 className="text-3xl font-semibold mb-4">{product.name}</h1>
 
       {product.image ? (
-        <img src={product.image} alt={product.name} className="w-full h-auto rounded mb-4" />
+        <Image src={product.image} alt={product.name} className="w-full h-auto rounded mb-4" />
       ) : (
         <p className="text-sm text-gray-400 mb-4">No image available</p>
       )}

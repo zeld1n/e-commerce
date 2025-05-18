@@ -1,8 +1,21 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import "@/types/user"
 
+type UserData = {
+    username: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    addressStreet: string;
+    addressZipCode: string;
+    addressCity: string;
+    addressCountry: string;
+    imageUrl?: string;
+    lastSeen: string;
+    role: string;
+  };
+  
 type AuthContextType = {
   isLoggedIn: boolean;
   setIsLoggedIn: (value: boolean) => void;

@@ -28,7 +28,7 @@ export default function CheckoutPage() {
       setCartItems(storedCart);
     }, []);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -44,7 +44,7 @@ export default function CheckoutPage() {
   const shipping = 4.99;
   const total = subtotal + shipping;
   
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     alert('Ordine inviato con successo!');
   };

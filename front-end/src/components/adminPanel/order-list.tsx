@@ -17,12 +17,35 @@ import { Input } from "@/components/adminPanel/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/adminPanel/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/adminPanel/ui/select"
 
+interface Order {
+  id: number
+  createdAt: string // потому что на фронт приходит как ISO-строка, не LocalDateTime
+  status: 'PENDING' | 'COMPLETED' | 'CANCELLED' // если ты ограничиваешь только этими статусами
+  totalAmount: number
+  user: {
+    id: number
+    email: string
+    name: string // если есть
+  }
+  items: {
+    id: number
+    quantity: number
+    price: number
+    product: {
+      id: number
+      name: string
+      imageUrl: string // если есть
+    }
+  }[]
+}
+
+
+
 export function OrderList() {
   const [selectedOrders, setSelectedOrders] = useState<string[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
-  const [orders, setOrders] = useState<any[]>([]) 
-  const [loading, setLoading] = useState(true)
+  const [orders, setOrders] = useState<Order[]>([]) 
   const [totalOrders, setTotalOrders] = useState(0) 
   const pageSize = 10
   const [currentPage, setCurrentPage] = useState(1)
@@ -30,15 +53,14 @@ export function OrderList() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        setLoading(true)
+        
         const response = await fetch(`http://localhost:8080/orders/all?page=${currentPage}&size=${pageSize}`)
         const data = await response.json()
         setOrders(data.content) 
         setTotalOrders(data.totalElements) 
       } catch (error) {
         console.error("Error fetching orders:", error)
-      } finally {
-        setLoading(false)
+      
       }
     }
 
@@ -48,8 +70,8 @@ export function OrderList() {
   const filteredOrders = useMemo(() => {
     return orders.filter(order => {
       const matchesSearch =
-        (order.customer && order.customer.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (order.email && order.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (order.user && order.user.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (order.user.email && order.user.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (order.id && order.id.toString().toLowerCase().includes(searchTerm.toLowerCase()))
 
       const matchesStatus = statusFilter === "all" || (order.status && order.status.toLowerCase() === statusFilter.toLowerCase())
@@ -143,7 +165,7 @@ export function OrderList() {
                   />
                 </TableCell>
                 <TableCell className="font-medium">{order.id}</TableCell>
-                <TableCell>{order.customer}</TableCell>
+                <TableCell>{order.user.name}</TableCell>
                 <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
                 <TableCell className="text-right">{order.items.length}</TableCell>
                 <TableCell className="text-right">${order.totalAmount.toFixed(2)}</TableCell>

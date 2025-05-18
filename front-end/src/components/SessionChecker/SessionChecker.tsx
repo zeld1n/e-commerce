@@ -24,7 +24,7 @@ export const SessionChecker = () => {
     };
 
     checkSession();
-  }, []);
+  }, [setIsLoggedIn, setUserData]);
 
   return null; 
 };

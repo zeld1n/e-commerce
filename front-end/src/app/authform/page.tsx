@@ -1,8 +1,22 @@
 'use client';
 import { useState } from "react";
 import { useAuth } from "@/app/context/auth-context"; // путь зависит от структуры
-import "@/types/user";
 import { useRouter } from 'next/navigation';
+
+type UserData = {
+    username: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    addressStreet: string;
+    addressZipCode: string;
+    addressCity: string;
+    addressCountry: string;
+    imageUrl?: string;
+    lastSeen: string;
+    role: string;
+  };
+  
 
 type UserFormData = {
   firstName: string;
