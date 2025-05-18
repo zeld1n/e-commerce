@@ -9,7 +9,7 @@ export const SessionChecker = () => {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const res = await fetch("http://localhost:8080/users/check_session", {
+        const res = await fetch("https://demo-deploy-gs0s.onrender.com/users/check_session", {
           credentials: "include",
         });
 

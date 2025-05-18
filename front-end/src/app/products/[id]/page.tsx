@@ -20,7 +20,7 @@ const ProductDetails = () => {
     const fetchProductDetails = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch(`http://localhost:8080/products/get/${id}`);
+        const res = await fetch(`https://demo-deploy-gs0s.onrender.com/products/get/${id}`);
         if (!res.ok) throw new Error('Failed to fetch product details');
         const data: Product = await res.json();
         setProduct(data);
