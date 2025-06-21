@@ -49,6 +49,7 @@ public class ProductController {
 
 
 
+
     @PostMapping("/add")
     public ResponseEntity<Product> createProduct(@RequestBody Product product) {
         if (product.getName().isEmpty() || product.getPrice() <= 0 || product.getQuantity() <= 0 || product.getImage().isEmpty()) {
@@ -76,6 +77,37 @@ public class ProductController {
 
         return ResponseEntity.notFound().build();
     }
+
+
+    @PutMapping("/updateInactive/{id}")
+    public ResponseEntity<Product> updateInactiveProd(@PathVariable long id) {
+        Optional<Product> optionalProduct = productRepository.findById(id);
+            if(optionalProduct.isPresent()) {
+                Product existing = optionalProduct.get();
+                existing.setStatus(Product.ProductStatus.INACTIVE);
+
+                Product saved = productRepository.save(existing);
+                return ResponseEntity.ok(saved);
+            }
+        return ResponseEntity.notFound().build();
+
+    }
+
+
+    @PutMapping("/updateActive/{id}")
+    public ResponseEntity<Product> updateActiveProd(@PathVariable long id) {
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        if(optionalProduct.isPresent()) {
+            Product existing = optionalProduct.get();
+            existing.setStatus(Product.ProductStatus.ACTIVE);
+
+            Product saved = productRepository.save(existing);
+            return ResponseEntity.ok(saved);
+        }
+        return ResponseEntity.notFound().build();
+
+    }
+
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Product> deleteProduct(@PathVariable long id){

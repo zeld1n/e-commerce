@@ -55,7 +55,7 @@ export default function ProductsPage() {
   useEffect(() => {
   const fetchCategories = async () => {
     try {
-      const res = await fetch('https://demo-deploy-gs0s.onrender.com/api/categories'); 
+      const res = await fetch('http://localhost:8080/api/categories'); 
       const data = await res.json();
       setCategories(data); 
     } catch (err) {
@@ -72,7 +72,7 @@ useEffect(() => {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `https://demo-deploy-gs0s.onrender.com/products/all?page=${currentPage}&` +
+        `http://localhost:8080/products/all?page=${currentPage}&` +
         `size=${productsPerPage}&` +
         `search=${encodeURIComponent(searchInput)}&` +
         `sortBy=${sortBy}&` +
@@ -80,9 +80,12 @@ useEffect(() => {
         `category=${encodeURIComponent(selectedCategory)}`
       );
       const data: ApiResponse = await res.json();
-      setProducts(data.products);
+
+       const activeProducts = data.products.filter(product => product.status === 'ACTIVE');
+
+      setProducts(activeProducts);
       setTotalPages(data.totalPages);
-    } catch (err) {
+    } catch (err) { 
       console.error('Failed to load products:', err);
     } finally {
       setIsLoading(false);

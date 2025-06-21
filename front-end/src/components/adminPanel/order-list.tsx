@@ -19,13 +19,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 interface Order {
   id: number
-  createdAt: string // потому что на фронт приходит как ISO-строка, не LocalDateTime
-  status: 'PENDING' | 'COMPLETED' | 'CANCELLED' // если ты ограничиваешь только этими статусами
+  createdAt: string
+  status: 'PENDING' | 'COMPLETED' | 'CANCELLED'
   totalAmount: number
   user: {
     id: number
     email: string
-    name: string // если есть
+    name: string
+    surname: string
   }
   items: {
     id: number
@@ -34,55 +35,56 @@ interface Order {
     product: {
       id: number
       name: string
-      imageUrl: string // если есть
+      imageUrl: string
     }
   }[]
 }
-
-
 
 export function OrderList() {
   const [selectedOrders, setSelectedOrders] = useState<string[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
-  const [orders, setOrders] = useState<Order[]>([]) 
-  const [totalOrders, setTotalOrders] = useState(0) 
+  const [orders, setOrders] = useState<Order[]>([])
+  const [totalOrders, setTotalOrders] = useState(0)
   const pageSize = 10
   const [currentPage, setCurrentPage] = useState(1)
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        
-        const response = await fetch(`https://demo-deploy-gs0s.onrender.com/orders/all?page=${currentPage}&size=${pageSize}`)
+        const response = await fetch(`http://localhost:8080/orders/all?page=${currentPage - 1}&size=${pageSize}`)
         const data = await response.json()
-        setOrders(data.content) 
-        setTotalOrders(data.totalElements) 
+        setOrders(data.content)
+        setTotalOrders(data.totalElements)
       } catch (error) {
         console.error("Error fetching orders:", error)
-      
       }
     }
 
     fetchOrders()
-  }, [currentPage]) 
+  }, [currentPage])
 
+  // Фильтрация по поиску и статусу внутри текущей страницы
   const filteredOrders = useMemo(() => {
     return orders.filter(order => {
-      const matchesSearch =
-        (order.user && order.user.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (order.user.email && order.user.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (order.id && order.id.toString().toLowerCase().includes(searchTerm.toLowerCase()))
+      const search = searchTerm.toLowerCase()
 
-      const matchesStatus = statusFilter === "all" || (order.status && order.status.toLowerCase() === statusFilter.toLowerCase())
+      const matchesSearch =
+        (order.user?.name?.toLowerCase().includes(search)) ||
+        (order.user?.surname?.toLowerCase().includes(search)) ||
+        (order.user?.email?.toLowerCase().includes(search)) ||
+        order.id.toString().includes(search)
+
+      const matchesStatus =
+        statusFilter === "all" || order.status.toLowerCase() === statusFilter.toLowerCase()
 
       return matchesSearch && matchesStatus
     })
-  }, [searchTerm, statusFilter, orders])
+  }, [orders, searchTerm, statusFilter])
 
-  const totalPages = Math.ceil(totalOrders / pageSize) 
-  const paginatedOrders = filteredOrders.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+  const totalPages = Math.ceil(totalOrders / pageSize)
 
+  // Чекбоксы выбора заказов на странице
   const toggleOrder = (orderId: string) => {
     setSelectedOrders(prev =>
       prev.includes(orderId) ? prev.filter(id => id !== orderId) : [...prev, orderId]
@@ -90,7 +92,7 @@ export function OrderList() {
   }
 
   const toggleAll = () => {
-    const idsOnPage = paginatedOrders.map(order => order.id.toString()) 
+    const idsOnPage = filteredOrders.map(order => order.id.toString())
     const allSelected = idsOnPage.every(id => selectedOrders.includes(id))
     setSelectedOrders(prev =>
       allSelected ? prev.filter(id => !idsOnPage.includes(id)) : [...prev, ...idsOnPage.filter(id => !prev.includes(id))]
@@ -120,14 +122,17 @@ export function OrderList() {
             }}
           />
         </div>
-        <Select value={statusFilter} onValueChange={(value) => {
-          setCurrentPage(1)
-          setStatusFilter(value)
-        }}>
+        <Select
+          value={statusFilter}
+          onValueChange={value => {
+            setCurrentPage(1)
+            setStatusFilter(value)
+          }}
+        >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-white">
             <SelectItem value="all">All Status</SelectItem>
             <SelectItem value="pending">Pending</SelectItem>
             <SelectItem value="completed">Completed</SelectItem>
@@ -142,12 +147,13 @@ export function OrderList() {
             <TableRow>
               <TableHead className="w-[50px]">
                 <Checkbox
-                  checked={paginatedOrders.length > 0 && paginatedOrders.every(order => selectedOrders.includes(order.id.toString()))}
+                  checked={filteredOrders.length > 0 && filteredOrders.every(order => selectedOrders.includes(order.id.toString()))}
                   onCheckedChange={toggleAll}
                 />
               </TableHead>
               <TableHead className="w-[100px]">Order ID</TableHead>
               <TableHead>Customer</TableHead>
+              <TableHead>E-mail</TableHead>
               <TableHead>Date</TableHead>
               <TableHead className="text-right">Items</TableHead>
               <TableHead className="text-right">Total</TableHead>
@@ -156,7 +162,7 @@ export function OrderList() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedOrders.map(order => (
+            {filteredOrders.map(order => (
               <TableRow key={order.id}>
                 <TableCell>
                   <Checkbox
@@ -165,7 +171,8 @@ export function OrderList() {
                   />
                 </TableCell>
                 <TableCell className="font-medium">{order.id}</TableCell>
-                <TableCell>{order.user.name}</TableCell>
+                <TableCell>{order.user.name} {order.user.surname}</TableCell>
+                <TableCell>{order.user.email}</TableCell>
                 <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
                 <TableCell className="text-right">{order.items.length}</TableCell>
                 <TableCell className="text-right">${order.totalAmount.toFixed(2)}</TableCell>

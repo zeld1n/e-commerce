@@ -13,7 +13,11 @@ const nextConfig: NextConfig = {
       {
         hostname: 'letsenhance.io'  
       },
+     {
+        hostname: 'i.postimg.cc'  
+      },
     ]
+
   }
 };
 

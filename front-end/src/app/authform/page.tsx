@@ -78,8 +78,8 @@ export default function AuthForm() {
     e.preventDefault();
   
     const endpoint = isSignUp
-      ? "https://demo-deploy-gs0s.onrender.com/users/add"
-      : "https://demo-deploy-gs0s.onrender.com/users/login";
+      ? "http://localhost:8080/users/add"
+      : "http://localhost:8080/users/login";
   
     const payload = isSignUp
       ? formData

@@ -2,6 +2,8 @@ package com.bogaiciuc.e_commerce.api.controller;
 
 import com.bogaiciuc.e_commerce.api.dto.LoginRequest;
 import com.bogaiciuc.e_commerce.api.dto.UserResponse;
+import com.bogaiciuc.e_commerce.persistence.entity.Session;
+import com.bogaiciuc.e_commerce.persistence.repository.SessionRepository;
 import com.bogaiciuc.e_commerce.persistence.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.validator.routines.EmailValidator;
@@ -19,8 +21,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
-
+import java.util.UUID;
 
 
 @RestController
@@ -33,6 +34,10 @@ public class UserController {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    SessionRepository sessionRepository;
+
+
 
     @GetMapping(path = "/all")
     public @ResponseBody Iterable<User> getAllUsers() {
@@ -40,7 +45,7 @@ public class UserController {
     }
 
 
-    @CrossOrigin(origins = "https://e-commerce-six-rho.vercel.app")
+    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/add")
     public ResponseEntity<UserResponse> createUser(@RequestBody User user) {
 
@@ -73,40 +78,74 @@ public class UserController {
 
 
 
-        @CrossOrigin(origins = "https://e-commerce-six-rho.vercel.app", allowCredentials = "true")
+        @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
         @GetMapping("/check_session")
-        public ResponseEntity<?> checkSession(@CookieValue(value = "session", required = false) String session) {
-            if (session == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "No session found"));
+        public ResponseEntity<?> checkSession(@CookieValue(value = "session", required = false) String sessionId) {
+            if (sessionId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "No session"));
             }
 
-            Optional<User> user = userRepository.findByUsername(session);
-            if (user.isEmpty()) {
+            Optional<Session> session = sessionRepository.findBySessionId(sessionId);
+            if (session.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Invalid session"));
             }
 
-            return ResponseEntity.ok(user.get());
+            Optional<User> user = userRepository.findById(session.get().getUserId());
+            if (user.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "User not found"));
+            }
+
+            return ResponseEntity.ok(Map.of("username", user.get().getUsername(), "role", user.get().getRole()));
         }
 
 
-        @PostMapping("/logout")
-        public ResponseEntity<?> logout(HttpServletResponse response) {
+    @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+    @PostMapping("/logout")
+        public ResponseEntity<?> logout(@CookieValue(value = "session", required = false) String sessionId,HttpServletResponse response) {
             ResponseCookie cookie = ResponseCookie.from("session", "")
                     .httpOnly(true)
                     .path("/")
                     .maxAge(0)
                     .build();
 
-            response.setHeader("Set-Cookie", cookie.toString());
+            Optional<Session> session = sessionRepository.findBySessionId(sessionId);
+            if (session.isPresent()) {
+                sessionRepository.delete(session.get());
+            }
+
+        response.setHeader("Set-Cookie", cookie.toString());
 
             return ResponseEntity.ok().build();
         }
 
 
 
+    @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+    @GetMapping("/auth/user-role")
+    public ResponseEntity<?> getUserRole(@CookieValue(value = "session", required = false) String sessionId) {
+        if (sessionId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "No session found"));
+        }
+
+        Optional<Session> session = sessionRepository.findBySessionId(sessionId);
+        if (session.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Invalid session"));
+        }
+
+        Optional<User> user = userRepository.findById(session.get().getUserId());
+        if (user.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "User not found"));
+        }
+
+        String role = user.get().getRole(); 
+        return ResponseEntity.ok(Map.of("role", role));
+    }
 
 
-    @CrossOrigin(origins = "https://e-commerce-six-rho.vercel.app")
+
+
+
+    @CrossOrigin(origins = "http://localhost:3000")
     @PutMapping("/update/{id}")
     public ResponseEntity<User> updateUser(@RequestBody User newUser, @PathVariable int id) {
         Optional<User> optionalUser = userRepository.findById(id);
@@ -128,7 +167,7 @@ public class UserController {
     }
 
 
-    @CrossOrigin(origins = "https://e-commerce-six-rho.vercel.app")
+    @CrossOrigin(origins = "http://localhost:3000")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable int id) {
         Optional<User> optionalUser = userRepository.findById(id);
@@ -140,8 +179,7 @@ public class UserController {
         }
     }
 
-
-    @CrossOrigin(origins = "https://e-commerce-six-rho.vercel.app", allowCredentials = "true")
+    @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
     @PostMapping(path = "/login")
     public ResponseEntity<Map<String, Object>> login(
             @RequestBody LoginRequest loginRequest,
@@ -152,6 +190,7 @@ public class UserController {
         if (user.isPresent() && passwordEncoder.matches(loginRequest.getPassword(), user.get().getPassword())) {
             Map<String, Object> responseBody = new HashMap<>();
             User u = user.get();
+            u.setLastSeen(LocalDateTime.now());
 
             // Добавляем user-данные
             responseBody.put("username", u.getUsername());
@@ -166,12 +205,18 @@ public class UserController {
             responseBody.put("lastSeen", u.getLastSeen());
             responseBody.put("role", u.getRole());
 
-            // 🍪 Устанавливаем cookie
-            ResponseCookie cookie = ResponseCookie.from("session", u.getRole())
+
+
+            String sessionId = UUID.randomUUID().toString();
+            Session session = new Session(sessionId, Math.toIntExact(u.getId()), LocalDateTime.now());
+            sessionRepository.save(session);
+
+        
+            ResponseCookie cookie = ResponseCookie.from("session", sessionId)
                     .httpOnly(true)
                     .secure(true) // в проде нужно true
                     .path("/")
-                    .maxAge(10000)
+                    .maxAge(Duration.ofDays(7))
                     .sameSite("None")
                     .build();
 
@@ -186,7 +231,7 @@ public class UserController {
 
 
 
-    @CrossOrigin(origins = "https://e-commerce-six-rho.vercel.app")
+    @CrossOrigin(origins = "http://localhost:3000")
     @PutMapping("/updateLocalTime/{id}")
     public ResponseEntity<User> updateLocalTimeUser(@PathVariable int id) {
         Optional<User> optionalUser = userRepository.findById(id);

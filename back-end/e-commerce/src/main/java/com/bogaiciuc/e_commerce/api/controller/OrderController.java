@@ -1,5 +1,6 @@
 package com.bogaiciuc.e_commerce.api.controller;
 
+import com.bogaiciuc.e_commerce.api.dto.OrderDTO;
 import com.bogaiciuc.e_commerce.persistence.entity.Order;
 import com.bogaiciuc.e_commerce.persistence.repository.OrderRepository;
 import org.springframework.data.domain.Page;
@@ -16,14 +17,16 @@ public class OrderController {
     OrderRepository orderRepository;
 
 
-    @CrossOrigin(origins = "https://e-commerce-six-rho.vercel.app")
+    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/all")
-    public Page<Order> getAllOrders(Pageable pageable) {
-        return orderRepository.findAll(pageable);
+    public Page<OrderDTO> getAllOrders(Pageable pageable) {
+        return orderRepository.findAll(pageable)
+                .map(OrderDTO::new);
     }
 
 
-    @CrossOrigin(origins = "https://e-commerce-six-rho.vercel.app")
+
+    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/total_amount")
     public ResponseEntity<Double> getTotal_amount(Order order) {
         return ResponseEntity.status(200).body(orderRepository.getTotalAmount());

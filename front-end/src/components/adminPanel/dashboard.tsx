@@ -2,7 +2,7 @@
 import Link from 'next/link';
 
 import { useState,useEffect } from "react"
-import { BarChart3, Box, LayoutDashboard, Package, Settings, ShoppingCart, Users } from "lucide-react"
+import {  Box, LayoutDashboard, Package, Settings, ShoppingCart, Users } from "lucide-react"
 import { Button } from "@/components/adminPanel/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/adminPanel/ui/card"
 import { Overview } from "@/components/adminPanel/overview"
@@ -11,16 +11,24 @@ import { ProductList } from "@/components/adminPanel/product-list"
 import { OrderList } from "@/components/adminPanel/order-list"
 import { CustomerList } from "@/components/adminPanel/customer-list"
 import { MobileNav } from "@/components/adminPanel/mobile-nav"
-
+import { useRouter } from 'next/navigation';
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview")
 
   const [totalAmount, setTotalAmount] = useState(0);
 
+
+  const router = useRouter();
+  const [role, setRole] = useState('');
+
+ 
+
+
+
   useEffect(() => {
     const fetchTotalAmount = async () => {
       try {
-        const response = await fetch("https://demo-deploy-gs0s.onrender.com/orders/total_amount");
+        const response = await fetch("http://localhost:8080/orders/total_amount");
         if (!response.ok) {
           throw new Error("Failed to fetch total amount");
         }
@@ -32,9 +40,35 @@ export default function Dashboard() {
     };
 
     fetchTotalAmount();
+
+
+    const fetchRole = async () => {
+        try {
+          const res = await fetch('http://localhost:8080/users/auth/user-role', {
+            credentials: 'include',
+          });
+
+          if (!res.ok) {
+            router.push('/login');
+            return;
+          }
+
+          const data = await res.json();
+          if (data.role !== 'admin') {
+            router.push('/homepage');
+          } else {
+            setRole(data.role);
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          router.push('/login');
+        }
+      };
+
+      fetchRole();
   }, []);
 
-
+  if (role !== 'admin') return null;
 
 
 
@@ -98,14 +132,14 @@ export default function Dashboard() {
                   <Users className="mr-2 h-4 w-4" />
                   Customers
                 </Button>
-                <Button
+                {/*<Button
                   variant={activeTab === "analytics" ? "secondary" : "ghost"}
                   className="justify-start"
                   onClick={() => setActiveTab("analytics")}
                 >
                   <BarChart3 className="mr-2 h-4 w-4" />
                   Analytics
-                </Button>
+                </Button>*/}
                 <Button
                   variant={activeTab === "settings" ? "secondary" : "ghost"}
                   className="justify-start"

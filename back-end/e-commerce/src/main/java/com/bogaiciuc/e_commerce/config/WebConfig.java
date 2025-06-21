@@ -12,7 +12,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         // Разрешаем CORS для всех эндпоинтов
         registry.addMapping("/**")  // Все эндпоинты приложения
-                .allowedOrigins("https://e-commerce-six-rho.vercel.app")  // Разрешаем запросы с фронтенда
+                .allowedOrigins("http://localhost:3000")  // Разрешаем запросы с фронтенда
                 .allowedMethods("GET", "POST", "PUT", "DELETE")  // Разрешаем методы GET, POST, PUT, DELETE
                 .allowedHeaders("*")  // Разрешаем все заголовки
                 .allowCredentials(true);  // Включаем поддержку cookies/учетных данных

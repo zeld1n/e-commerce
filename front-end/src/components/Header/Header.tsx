@@ -1,23 +1,41 @@
 'use client';
 
+import React, { useState, useEffect } from 'react';
+import { Menu, X, ShoppingCart, Heart, User } from 'lucide-react';
 import Link from 'next/link';
-import { Product } from '@/types/product';
-import { useAuth } from "@/app/context/auth-context";
-import { useState, useEffect } from 'react';
-import { ShoppingBagIcon, ShoppingCartIcon, UserCircleIcon, UserIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { useAuth } from "@/app/context/auth-context"; // предполагаем, что useAuth возвращает { isLoggedIn, userData, logout }
+
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+}
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const { isLoggedIn, userData, logout} = useAuth();
-
-
+  const [categories, setCategories] = useState<string[]>([]);
   const [cartItems, setCartItems] = useState<Product[]>([]);
+
+  const { isLoggedIn, userData, logout } = useAuth();
 
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
     setCartItems(storedCart);
   }, []);
+
+  useEffect(() => {
+    fetch('http://localhost:8080/api/categories')
+      .then((res) => res.json())
+      .then((data) => setCategories(data))
+      .catch((err) => console.error('Failed to load categories:', err));
+  }, []);
+
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const toggleProfile = () => setIsProfileOpen(!isProfileOpen);
+
 
   const handleCartUpdate = () => {
     const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -25,11 +43,7 @@ export const Header = () => {
     console.log('Cart refreshed from localStorage:', storedCart);
   };
 
-  const calculateTotal = () => {
-    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
-  };
-
-  const handleLinkClick = () => {
+ const handleLinkClick = () => {
     setIsMenuOpen(false);
   };
 
@@ -43,185 +57,131 @@ export const Header = () => {
     handleCartUpdate();   
   };
 
-  const handleIncreaseQuantity = (id: number) => {
-    const updatedCart = cartItems.map(item =>
-      item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-    );
-    setCartItems(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));  
-  };
+  const calculateTotal = () =>
+    cartItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
 
-  const handleDecreaseQuantity = (id: number) => {
+  const handleQuantityChange = (id: number, delta: number) => {
     const updatedCart = cartItems.map(item =>
-      item.id === id && item.quantity > 1
-        ? { ...item, quantity: item.quantity - 1 }
-        : item
+      item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item
     );
     setCartItems(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));  
+    localStorage.setItem('cart', JSON.stringify(updatedCart));
   };
 
   return (
-    <header className="flex justify-between items-center p-4 bg-sky-950 text-white relative z-50">
-      <Link
-        href="/homepage"
-        className="transition-colors duration-300 ease-in-out hover:bg-gray-700 p-2 rounded text-xl font-bold"
-        onClick={handleLinkClick}
-      >
-        E-Commerce
-      </Link>
+    <>
+      <header className="bg-white shadow-md sticky top-0 z-50">
+        <div className="container mx-auto flex items-center justify-between px-4 py-4">
+          {/* Лого */}
+          <Link href="/" className="text-2xl font-bold text-blue-600">
+            E-Commerce
+          </Link>
 
-      {/* bur-menu */}
-      <button
-        className="md:hidden absolute right-4"
-        onClick={() => setIsMenuOpen(!isMenuOpen)}
-        aria-label="Toggle Menu"
-      >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      </button>
+          {/* Навигация (только desktop) */}
+          <nav className="hidden lg:flex  gap-6 text-gray-700 font-medium">
+            <Link href="/homepage" className="hover:text-blue-600">Home</Link>
+            <Link href="/products" className="hover:text-blue-600">Products</Link>
+            <Link href="/about-us" className="hover:text-blue-600">About Us</Link>
+          </nav>
 
-      {/* navbar */}
-      <nav>
-        <ul
-          className={`flex flex-col md:flex-row gap-4 md:gap-6 absolute md:static top-[70px] left-0 w-full md:w-auto bg-sky-950 md:bg-transparent p-4 md:p-0 transition-all duration-300 ease-in-out ${isMenuOpen ? 'block' : 'hidden md:flex'}`}
-        >
-          <li className="flex items-center">
-            <Link
-              href="/products"
-              className="transition-colors duration-300 ease-in-out hover:bg-gray-700 p-2 rounded flex items-center"
-              onClick={handleLinkClick}
-            >
-              <ShoppingBagIcon className="w-5 h-5" /> Products
-            </Link>
-          </li>
-          <li className="flex items-center">
-            <Link
-              href="/about-us"
-              className="transition-colors duration-300 ease-in-out hover:bg-gray-700 p-2 rounded flex items-center"
-              onClick={handleLinkClick}
-            >
-              <UserIcon className="w-5 h-5" /> About Us
-            </Link>
-          </li>
+          {/* Иконки действий */}
+          <div className="flex items-center gap-4">
+            <button className="relative text-gray-700 hover:text-red-500">
+              <Heart className="h-6 w-6" />
+              <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+            </button>
 
-          {isLoggedIn ? (
-            <>
-              <li>
-                <button
-                  className="transition-colors duration-300 ease-in-out hover:bg-gray-700 p-2 rounded flex items-center gap-1 cursor-pointer"
-                  onClick={handleCartAndLinkClick}
-                >
-                  <ShoppingCartIcon className="w-5 h-5" />
-                  <span>Cart</span>
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => {
-                    logout();
-                    handleLinkClick(); 
-                  }}
-                  className="transition-colors duration-300 ease-in-out hover:bg-gray-700 p-2 rounded flex items-center gap-1 cursor-pointer"
-                >
-                  <XMarkIcon className="w-5 h-5"/>
-                  Logout
-                </button>
-              </li>
-
-              <li>
-                <Link
-                  href="/profile"
-                  className="transition-colors duration-300 ease-in-out hover:bg-gray-700 p-2 rounded flex items-center gap-1"
-                  onClick={handleLinkClick}
-                >
-                  <UserCircleIcon className="w-5 h-5" />
-                  <span>Profile</span>
-                </Link>
-              </li>
-
-              {userData?.role === 'admin' && (
-                <li>
-                  <Link
-                    href="/adminPanel"
-                    className="transition-colors duration-300 ease-in-out hover:bg-gray-700 p-2 rounded flex items-center gap-1"
-                    onClick={handleLinkClick}
-                  >
-                    <UserCircleIcon className="w-5 h-5" />
-                    <span>Admin Panel</span>
-                  </Link>
-                </li>
+            {/* Корзина */}
+            <button onClick={handleCartAndLinkClick} className="relative text-gray-700 hover:text-blue-600">
+              <ShoppingCart className="h-6 w-6" />
+              {cartItems.length > 0 && (
+                <span className="absolute -top-1 -right-2 bg-blue-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {cartItems.length}
+                </span>
               )}
-            </>
-          ) : (
-            <li>
-              <Link
-                href="/authform"
-                className="transition-colors duration-300 ease-in-out hover:bg-gray-700 p-2 rounded flex items-center gap-1"
-                onClick={handleLinkClick}
-              >
+            </button>
+
+            {/* Профиль / Логин */}
+            {isLoggedIn ? (
+              <div className="relative">
+                <button onClick={toggleProfile} className="text-gray-700 hover:text-blue-600">
+                  <User className="h-6 w-6" />
+                </button>
+
+                {isProfileOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white shadow-md border rounded-lg py-2">
+                    <Link href="/profile" className="block px-4 py-2 hover:bg-gray-100">Il mio Profilo</Link>
+                    <Link href="/orders" className="block px-4 py-2 hover:bg-gray-100">I miei Ordini</Link>
+                    <Link href="/wishlist" className="block px-4 py-2 hover:bg-gray-100">Lista Desideri</Link>
+                    {userData?.role === 'admin' && (
+                      <Link href="/adminPanel" className="block px-4 py-2 hover:bg-gray-100 text-blue-600">Admin Panel</Link>
+                    )}
+                    <button onClick={logout} className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-100">
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link href="/authform" className="text-gray-700 hover:text-blue-600">
                 Login
               </Link>
-            </li>
-          )}
-        </ul>
-      </nav>
+            )}
 
-      {/*корзинка*/}
-      <div
-        className={`fixed top-0 right-0 w-[300px] h-full bg-white shadow-lg z-40 transition-all duration-500 ease-in-out transform ${
-          isCartOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
-      >
-        <button
-          className="absolute top-4 right-4 p-2 text-gray-600 hover:text-gray-900 cursor-pointer"
-          onClick={handleCartToggle}
-        >
-          <XMarkIcon className="w-6 h-6" />
-        </button>
+            {/* Mobile меню */}
+            <button onClick={toggleMenu} className="lg:hidden text-gray-700">
+              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile меню */}
+      {isMenuOpen && (
+        <div className="lg:hidden bg-white shadow-md border-t">
+          <nav className="flex flex-col p-4 gap-4">
+            <Link href="/homepage" className="text-gray-700 hover:text-blue-600">Home</Link>
+            <Link href="/products" className="text-gray-700 hover:text-blue-600">Prodotti</Link>
+            <Link href="/about-us" className="text-gray-700 hover:text-blue-600">About Us</Link>
+            <Link href="/contact" className="text-gray-700 hover:text-blue-600">Contatti</Link>
+          </nav>
+        </div>
+      )}
+
+      {/* Сайдбар корзины */}
+      <div className={`fixed top-0 right-0 w-80 h-full bg-white shadow-lg z-50 transition-transform ${isCartOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         <div className="p-4">
-          <h3 className="text-lg font-semibold text-gray-900">Your Cart</h3>
-          <ul className="mt-4 text-gray-900">
+          <button onClick={handleCartToggle} className="absolute top-4 right-4 text-gray-700 hover:text-black">
+            <X className="h-6 w-6" />
+          </button>
+          <h2 className="text-lg font-semibold mb-4">Your Cart</h2>
+          <ul>
             {cartItems.length > 0 ? (
               cartItems.map(item => (
-                <li key={item.id} className="border-b pb-2">
+                <li key={item.id} className="border-b py-2">
                   <div className="flex justify-between items-center">
-                    <p>{item.name} (x{item.quantity})</p>
+                    <span>{item.name}</span>
                     <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => handleDecreaseQuantity(item.id)}
-                        className="text-gray-600 hover:text-gray-900"
-                      >
-                        -
-                      </button>
+                      <button onClick={() => handleQuantityChange(item.id, -1)}>-</button>
                       <span>{item.quantity}</span>
-                      <button
-                        onClick={() => handleIncreaseQuantity(item.id)}
-                        className="text-gray-600 hover:text-gray-900"
-                      >
-                        +
-                      </button>
+                      <button onClick={() => handleQuantityChange(item.id, 1)}>+</button>
                     </div>
                   </div>
-                  <p>€{(item.price * item.quantity).toFixed(2)}</p>
+                  <p className="text-sm text-gray-600">€{(item.price * item.quantity).toFixed(2)}</p>
                 </li>
               ))
             ) : (
               <li className="text-gray-500">Your cart is empty.</li>
             )}
           </ul>
-          <div className="mt-4">
-            <p className="font-semibold text-gray-900">Total: €{calculateTotal()}</p>
-            <Link href="/checkout">
-              <button className="w-full mt-4 bg-blue-600 text-white p-2 rounded hover:bg-blue-700 cursor-pointer">
-                Checkout
-              </button>
-            </Link>
-
-          </div>
+          <p className="mt-4 font-semibold">Total: €{calculateTotal()}</p>
+          <Link href="/checkout">
+            <button className="mt-4 w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">Checkout</button>
+          </Link>
         </div>
       </div>
-    </header>
+    </>
   );
 };
+
+export default Header;

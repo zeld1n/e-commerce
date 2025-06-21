@@ -21,7 +21,7 @@ const ProductDetails = () => {
     const fetchProductDetails = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch(`https://demo-deploy-gs0s.onrender.com/products/get/${id}`);
+        const res = await fetch(`http://localhost:8080/products/get/${id}`);
         if (!res.ok) throw new Error('Failed to fetch product details');
         const data: Product = await res.json();
         setProduct(data);
@@ -57,13 +57,16 @@ const ProductDetails = () => {
   if (isLoading) return <p>Loading product details...</p>;
   if (error) return <p>{error}</p>;
   if (!product) return <p>Product not found.</p>;
+  if (product.status !== 'Active') return <p>This product is not available.</p>;
+
 
   return (
     <div className="max-w-3xl mx-auto p-4">
       <h1 className="text-3xl font-semibold mb-4">{product.name}</h1>
 
       {product.image ? (
-        <Image src={product.image} alt={product.name} className="w-full h-auto rounded mb-4" />
+        <Image src={product.image} alt={product.name} width={500}
+  height={500} className=" rounded mb-4" />
       ) : (
         <p className="text-sm text-gray-400 mb-4">No image available</p>
       )}

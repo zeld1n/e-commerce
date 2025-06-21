@@ -5,5 +5,6 @@ export type Product = {
   quantity:number;
   image: string | null;
   description: string;
+  status: string;
 
 }

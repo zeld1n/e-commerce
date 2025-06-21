@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     try {
-      await fetch("https://demo-deploy-gs0s.onrender.com/users/logout", {
+      await fetch("http://localhost:8080/users/logout", {
         method: "POST",
         credentials: "include",
       });

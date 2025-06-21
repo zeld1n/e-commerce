@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { ArrowUpDown, MoreHorizontal, Plus, Search } from "lucide-react"
+import { useEffect, useState } from "react"
+import { ArrowUpDown, MoreHorizontal, Plus, Search, ChevronLeft, ChevronRight } from "lucide-react"
 
 import { Button } from "@/components/adminPanel/ui/button"
 import { Card } from "@/components/adminPanel/ui/card"
@@ -15,103 +15,141 @@ import {
   DropdownMenuTrigger,
 } from "@/components/adminPanel/ui/dropdown-menu"
 import { Input } from "@/components/adminPanel/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/adminPanel/ui/table"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/adminPanel/ui/select"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/adminPanel/ui/table"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/adminPanel/ui/select"
 
-const products = [
-  {
-    id: "PROD-1234",
-    name: "Wireless Bluetooth Headphones",
-    category: "Electronics",
-    price: 89.99,
-    stock: 45,
-    status: "In Stock",
-  },
-  {
-    id: "PROD-2345",
-    name: "Organic Cotton T-Shirt",
-    category: "Clothing",
-    price: 24.99,
-    stock: 120,
-    status: "In Stock",
-  },
-  {
-    id: "PROD-3456",
-    name: "Stainless Steel Water Bottle",
-    category: "Home & Kitchen",
-    price: 19.95,
-    stock: 78,
-    status: "In Stock",
-  },
-  {
-    id: "PROD-4567",
-    name: "Wireless Charging Pad",
-    category: "Electronics",
-    price: 29.99,
-    stock: 32,
-    status: "In Stock",
-  },
-  {
-    id: "PROD-5678",
-    name: "Leather Wallet",
-    category: "Accessories",
-    price: 49.99,
-    stock: 15,
-    status: "Low Stock",
-  },
-  {
-    id: "PROD-6789",
-    name: "Smart Fitness Tracker",
-    category: "Electronics",
-    price: 79.99,
-    stock: 0,
-    status: "Out of Stock",
-  },
-  {
-    id: "PROD-7890",
-    name: "Ceramic Coffee Mug",
-    category: "Home & Kitchen",
-    price: 12.99,
-    stock: 94,
-    status: "In Stock",
-  },
-  {
-    id: "PROD-8901",
-    name: "Bluetooth Portable Speaker",
-    category: "Electronics",
-    price: 59.99,
-    stock: 28,
-    status: "In Stock",
-  },
-  {
-    id: "PROD-9012",
-    name: "Yoga Mat",
-    category: "Sports & Outdoors",
-    price: 34.95,
-    stock: 42,
-    status: "In Stock",
-  },
-  {
-    id: "PROD-0123",
-    name: "Scented Candle Set",
-    category: "Home & Kitchen",
-    price: 22.99,
-    stock: 5,
-    status: "Low Stock",
-  },
-]
+
+
+interface Product {
+  id: string
+  name: string
+  category: Category
+  price: number
+  quantity: number
+  status: string
+}
+
+interface Category {
+  id: string
+  name: string
+  description: string
+}
+
+interface ApiResponse {
+  products: Product[]
+  totalPages: number
+}
 
 export function ProductList() {
+  const [products, setProducts] = useState<Product[]>([])
+  const [categories, setCategories] = useState<string[]>([])
+  const [searchInput, setSearchInput] = useState("")
+  const [currentPage, setCurrentPage] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
+  const [productsPerPage] = useState(10)
+  const [sortBy] = useState("name")
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
+  const [selectedCategory, setSelectedCategory] = useState("all")
   const [selectedProducts, setSelectedProducts] = useState<string[]>([])
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:8080/products/all?page=${currentPage}&size=${productsPerPage}` +
+            `&search=${encodeURIComponent(searchInput)}` +
+            `&sortBy=${sortBy}&sortDir=${sortDirection}` +
+            `&category=${selectedCategory === "all" ? "" : encodeURIComponent(selectedCategory)}`
+        )
+        const data: ApiResponse = await res.json()
+        setProducts(data.products)
+        setTotalPages(data.totalPages)
+      } catch (err) {
+        console.error("Failed to load products:", err)
+      } finally {
+      }
+    }
+
+    fetchProducts()
+  }, [currentPage, productsPerPage, searchInput, sortBy, sortDirection, selectedCategory])
+
+
+
+
+  const handleInactiveProduct = async (id: string) => {
+  try {
+    const response = await fetch(`http://localhost:8080/products/updateInactive/${id}`, {
+      method: "PUT",
+    })
+
+    if (!response.ok) {
+      throw new Error("Failed innactive product")
+    }
+
+    setProducts((prev) => prev.filter((product) => product.id !== id))
+  } catch (error) {
+    console.error("Error innactive product:", error)
+    alert("Failed to innactive product.")
+  }
+}
+
+
+const handleActiveProduct = async (id: string) => {
+  try {
+    const response = await fetch(`http://localhost:8080/products/updateActive/${id}`, {
+      method: "PUT",
+    })
+
+    if (!response.ok) {
+      throw new Error("Failed Active product")
+    }
+
+    setProducts((prev) => prev.filter((product) => product.id !== id))
+  } catch (error) {
+    console.error("Error Active product:", error)
+    alert("Failed to Active product.")
+  }
+}
+
+
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("http://localhost:8080/api/categories")
+        const data = await res.json()
+        setCategories(data)
+      } catch (err) {
+        console.error("Failed to load categories:", err)
+      }
+    }
+
+    fetchCategories()
+  }, [])
 
   const toggleProduct = (productId: string) => {
     setSelectedProducts((prev) =>
-      prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId],
+      prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId]
     )
   }
 
   const toggleAll = () => {
-    setSelectedProducts((prev) => (prev.length === products.length ? [] : products.map((product) => product.id)))
+    setSelectedProducts((prev) =>
+      prev.length === products.length ? [] : products.map((product) => product.id)
+    )
   }
 
   return (
@@ -128,30 +166,25 @@ export function ProductList() {
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input type="search" placeholder="Search products..." className="pl-8 w-full md:w-[300px] lg:w-[400px]" />
+          <Input
+            type="search"
+            placeholder="Search products..."
+            className="pl-8 w-full md:w-[300px] lg:w-[400px]"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+          />
         </div>
-        <Select defaultValue="all">
+        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Category" />
           </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Categories</SelectItem>
-            <SelectItem value="electronics">Electronics</SelectItem>
-            <SelectItem value="clothing">Clothing</SelectItem>
-            <SelectItem value="home">Home & Kitchen</SelectItem>
-            <SelectItem value="accessories">Accessories</SelectItem>
-            <SelectItem value="sports">Sports & Outdoors</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select defaultValue="all">
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="in-stock">In Stock</SelectItem>
-            <SelectItem value="low-stock">Low Stock</SelectItem>
-            <SelectItem value="out-of-stock">Out of Stock</SelectItem>
+          <SelectContent className="bg-white">
+            <SelectItem value="all" >All Categories</SelectItem>
+            {categories.map((cat) => (
+              <SelectItem key={cat} value={cat}>
+                {cat}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
@@ -167,7 +200,12 @@ export function ProductList() {
               </TableHead>
               <TableHead className="w-[100px]">ID</TableHead>
               <TableHead>
-                <div className="flex items-center space-x-1">
+                <div
+                  className="flex items-center space-x-1 cursor-pointer"
+                  onClick={() =>
+                    setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+                  }
+                >
                   <span>Product</span>
                   <ArrowUpDown className="h-4 w-4" />
                 </div>
@@ -190,17 +228,17 @@ export function ProductList() {
                 </TableCell>
                 <TableCell className="font-medium">{product.id}</TableCell>
                 <TableCell>{product.name}</TableCell>
-                <TableCell>{product.category}</TableCell>
+                <TableCell>{product.category.name}</TableCell>
                 <TableCell className="text-right">${product.price.toFixed(2)}</TableCell>
-                <TableCell className="text-right">{product.stock}</TableCell>
+                <TableCell className="text-right">{product.quantity}</TableCell>
                 <TableCell>
                   <div
                     className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                      product.status === "In Stock"
+                      product.status === "ACTIVE"
                         ? "bg-green-100 text-green-800"
-                        : product.status === "Low Stock"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-red-100 text-red-800"
+                        : product.status === "INACTIVE"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : "bg-red-100 text-red-800"
                     }`}
                   >
                     {product.status}
@@ -218,8 +256,17 @@ export function ProductList() {
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
                       <DropdownMenuItem>Edit product</DropdownMenuItem>
                       <DropdownMenuItem>View details</DropdownMenuItem>
+                      <DropdownMenuItem className="text-green-600"
+                          onClick={() => handleActiveProduct(product.id)}
+                        >
+                          Active product</DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-red-600">Delete product</DropdownMenuItem>
+                      <DropdownMenuItem
+                          className="text-red-600"
+                          onClick={() => handleInactiveProduct(product.id)}
+                        >
+                          Inactive product
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
@@ -227,6 +274,30 @@ export function ProductList() {
             ))}
           </TableBody>
         </Table>
+        {/* Pagination */}
+        <div className="flex justify-between items-center px-4 py-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage((p) => Math.max(p - 1, 0))}
+            disabled={currentPage === 0}
+          >
+            <ChevronLeft className="h-4 w-4 mr-1" />
+            Previous
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            Page {currentPage + 1} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages - 1))}
+            disabled={currentPage >= totalPages - 1}
+          >
+            Next
+            <ChevronRight className="h-4 w-4 ml-1" />
+          </Button>
+        </div>
       </Card>
     </div>
   )
