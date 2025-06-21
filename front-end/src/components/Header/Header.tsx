@@ -27,7 +27,7 @@ export const Header = () => {
   }, []);
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/categories')
+    fetch('https://demo-deploy-gs0s.onrender.com/api/categories')
       .then((res) => res.json())
       .then((data) => setCategories(data))
       .catch((err) => console.error('Failed to load categories:', err));

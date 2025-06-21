@@ -54,14 +54,12 @@ export default function CheckoutPage() {
     <div className="flex flex-col min-h-screen bg-sky-950 text-white">
 
 
-      {/* Main Content */}
       <main className="flex-grow py-8 bg-sky-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:grid lg:grid-cols-12 lg:gap-8">
-          {/* Checkout Form */}
+
           <div className="lg:col-span-8">
             <form onSubmit={handleSubmit} className="space-y-8">
 
-              {/* Shipping */}
               <div className="bg-sky-900 p-6 rounded-lg shadow">
                 <h2 className="text-xl font-semibold mb-4">Indirizzo di spedizione</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -143,7 +141,7 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* Payment */}
+
               <div className="bg-sky-900 p-6 rounded-lg shadow">
                 <h2 className="text-xl font-semibold mb-4">Metodo di pagamento</h2>
                 <div className="space-y-6">
@@ -206,7 +204,6 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 className="w-full bg-sky-500 hover:bg-sky-600 text-white py-3 px-4 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-sky-400"
@@ -216,12 +213,12 @@ export default function CheckoutPage() {
             </form>
           </div>
 
-          {/* Order Summary */}
+
           <div className="lg:col-span-4 mt-8 lg:mt-0">
             <div className="bg-sky-900 p-6 rounded-lg shadow sticky top-6">
               <h2 className="text-xl font-semibold mb-4">Riepilogo ordine</h2>
               
-              {/* Cart Items */}
+
               <div className="space-y-4 mb-6">
                 {cartItems.map(item => (
                   <div key={item.id} className="flex items-center justify-between">

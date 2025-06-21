@@ -52,7 +52,7 @@ export function OrderList() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/orders/all?page=${currentPage - 1}&size=${pageSize}`)
+        const response = await fetch(`https://demo-deploy-gs0s.onrender.com/orders/all?page=${currentPage - 1}&size=${pageSize}`)
         const data = await response.json()
         setOrders(data.content)
         setTotalOrders(data.totalElements)

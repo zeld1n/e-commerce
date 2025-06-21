@@ -69,7 +69,7 @@ export function ProductList() {
     const fetchProducts = async () => {
       try {
         const res = await fetch(
-          `http://localhost:8080/products/all?page=${currentPage}&size=${productsPerPage}` +
+          `https://demo-deploy-gs0s.onrender.com/products/all?page=${currentPage}&size=${productsPerPage}` +
             `&search=${encodeURIComponent(searchInput)}` +
             `&sortBy=${sortBy}&sortDir=${sortDirection}` +
             `&category=${selectedCategory === "all" ? "" : encodeURIComponent(selectedCategory)}`
@@ -91,7 +91,7 @@ export function ProductList() {
 
   const handleInactiveProduct = async (id: string) => {
   try {
-    const response = await fetch(`http://localhost:8080/products/updateInactive/${id}`, {
+    const response = await fetch(`https://demo-deploy-gs0s.onrender.com/products/updateInactive/${id}`, {
       method: "PUT",
     })
 
@@ -109,7 +109,7 @@ export function ProductList() {
 
 const handleActiveProduct = async (id: string) => {
   try {
-    const response = await fetch(`http://localhost:8080/products/updateActive/${id}`, {
+    const response = await fetch(`https://demo-deploy-gs0s.onrender.com/products/updateActive/${id}`, {
       method: "PUT",
     })
 
@@ -129,7 +129,7 @@ const handleActiveProduct = async (id: string) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch("http://localhost:8080/api/categories")
+        const res = await fetch("https://demo-deploy-gs0s.onrender.com/api/categories")
         const data = await res.json()
         setCategories(data)
       } catch (err) {

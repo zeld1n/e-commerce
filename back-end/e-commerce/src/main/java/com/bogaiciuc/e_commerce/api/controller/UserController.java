@@ -45,7 +45,7 @@ public class UserController {
     }
 
 
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin(origins = "https://e-commerce-six-rho.vercel.app")
     @PostMapping("/add")
     public ResponseEntity<UserResponse> createUser(@RequestBody User user) {
 
@@ -78,7 +78,7 @@ public class UserController {
 
 
 
-        @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+        @CrossOrigin(origins = "https://e-commerce-six-rho.vercel.app", allowCredentials = "true")
         @GetMapping("/check_session")
         public ResponseEntity<?> checkSession(@CookieValue(value = "session", required = false) String sessionId) {
             if (sessionId == null) {
@@ -99,7 +99,7 @@ public class UserController {
         }
 
 
-    @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+    @CrossOrigin(origins = "https://e-commerce-six-rho.vercel.app", allowCredentials = "true")
     @PostMapping("/logout")
         public ResponseEntity<?> logout(@CookieValue(value = "session", required = false) String sessionId,HttpServletResponse response) {
             ResponseCookie cookie = ResponseCookie.from("session", "")
@@ -120,7 +120,7 @@ public class UserController {
 
 
 
-    @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+    @CrossOrigin(origins = "https://e-commerce-six-rho.vercel.app", allowCredentials = "true")
     @GetMapping("/auth/user-role")
     public ResponseEntity<?> getUserRole(@CookieValue(value = "session", required = false) String sessionId) {
         if (sessionId == null) {
@@ -145,7 +145,7 @@ public class UserController {
 
 
 
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin(origins = "https://e-commerce-six-rho.vercel.app")
     @PutMapping("/update/{id}")
     public ResponseEntity<User> updateUser(@RequestBody User newUser, @PathVariable int id) {
         Optional<User> optionalUser = userRepository.findById(id);
@@ -167,7 +167,7 @@ public class UserController {
     }
 
 
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin(origins = "https://e-commerce-six-rho.vercel.app")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable int id) {
         Optional<User> optionalUser = userRepository.findById(id);
@@ -179,7 +179,7 @@ public class UserController {
         }
     }
 
-    @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+    @CrossOrigin(origins = "https://e-commerce-six-rho.vercel.app", allowCredentials = "true")
     @PostMapping(path = "/login")
     public ResponseEntity<Map<String, Object>> login(
             @RequestBody LoginRequest loginRequest,
@@ -231,7 +231,7 @@ public class UserController {
 
 
 
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin(origins = "https://e-commerce-six-rho.vercel.app")
     @PutMapping("/updateLocalTime/{id}")
     public ResponseEntity<User> updateLocalTimeUser(@PathVariable int id) {
         Optional<User> optionalUser = userRepository.findById(id);

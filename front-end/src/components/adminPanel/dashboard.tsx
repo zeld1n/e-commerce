@@ -28,7 +28,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchTotalAmount = async () => {
       try {
-        const response = await fetch("http://localhost:8080/orders/total_amount");
+        const response = await fetch("https://demo-deploy-gs0s.onrender.com/orders/total_amount");
         if (!response.ok) {
           throw new Error("Failed to fetch total amount");
         }
@@ -44,7 +44,7 @@ export default function Dashboard() {
 
     const fetchRole = async () => {
         try {
-          const res = await fetch('http://localhost:8080/users/auth/user-role', {
+          const res = await fetch('https://demo-deploy-gs0s.onrender.com/users/auth/user-role', {
             credentials: 'include',
           });
 

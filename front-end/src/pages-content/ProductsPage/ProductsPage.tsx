@@ -55,7 +55,7 @@ export default function ProductsPage() {
   useEffect(() => {
   const fetchCategories = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/categories'); 
+      const res = await fetch('https://demo-deploy-gs0s.onrender.com/api/categories'); 
       const data = await res.json();
       setCategories(data); 
     } catch (err) {
@@ -72,7 +72,7 @@ useEffect(() => {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `http://localhost:8080/products/all?page=${currentPage}&` +
+        `https://demo-deploy-gs0s.onrender.com/products/all?page=${currentPage}&` +
         `size=${productsPerPage}&` +
         `search=${encodeURIComponent(searchInput)}&` +
         `sortBy=${sortBy}&` +

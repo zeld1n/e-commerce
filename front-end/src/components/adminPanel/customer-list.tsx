@@ -59,7 +59,7 @@ export function CustomerList() {
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const res = await fetch('http://localhost:8080/users/all')
+        const res = await fetch('https://demo-deploy-gs0s.onrender.com/users/all')
         const data = await res.json()
         setCustomers(data)
       } catch (err) {
@@ -73,7 +73,7 @@ export function CustomerList() {
 
   const deleteCustomer = async (customerId: number) => {
   try {
-    const res = await fetch(`http://localhost:8080/users/delete/${customerId}`, {
+    const res = await fetch(`https://demo-deploy-gs0s.onrender.com/users/delete/${customerId}`, {
       method: 'DELETE',
     })
 
