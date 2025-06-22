@@ -66,7 +66,7 @@ export default function Dashboard() {
       };
 
       fetchRole();
-  }, []);
+  },);
 
   if (role !== 'admin') return null;
 

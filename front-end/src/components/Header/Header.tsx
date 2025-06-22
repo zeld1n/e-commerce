@@ -16,7 +16,6 @@ export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [categories, setCategories] = useState<string[]>([]);
   const [cartItems, setCartItems] = useState<Product[]>([]);
 
   const { isLoggedIn, userData, logout } = useAuth();
@@ -26,12 +25,7 @@ export const Header = () => {
     setCartItems(storedCart);
   }, []);
 
-  useEffect(() => {
-    fetch('https://demo-deploy-gs0s.onrender.com/api/categories')
-      .then((res) => res.json())
-      .then((data) => setCategories(data))
-      .catch((err) => console.error('Failed to load categories:', err));
-  }, []);
+  
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleProfile = () => setIsProfileOpen(!isProfileOpen);

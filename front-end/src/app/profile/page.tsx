@@ -62,7 +62,7 @@ const EcommerceProfile = () => {
     }
   ];
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = (any:e) => {
     switch (status) {
       case 'Consegnato':
         return <CheckCircle className="w-5 h-5 text-green-500" />;

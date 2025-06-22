@@ -1,6 +1,7 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import { ShoppingCart,  Star, ChevronLeft, ChevronRight, Truck, Shield, Clock, Award } from 'lucide-react';
+import  Image from 'next/image';
 
 const Homepage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -92,7 +93,7 @@ const Homepage = () => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  },);
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
@@ -227,7 +228,7 @@ const Homepage = () => {
             {featuredProducts.map((product) => (
               <div key={product.id} className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100">
                 <div className="relative overflow-hidden">
-                  <img 
+                  <Image 
                     src={product.image} 
                     alt={product.name}
                     className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
