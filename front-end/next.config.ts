@@ -16,6 +16,10 @@ const nextConfig: NextConfig = {
      {
         hostname: 'i.postimg.cc'  
       },
+       {
+        hostname: 'images.unsplash.com'  
+      },
+      
     ]
 
   }

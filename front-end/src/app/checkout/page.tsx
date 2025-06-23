@@ -44,10 +44,58 @@ export default function CheckoutPage() {
   const shipping = 4.99;
   const total = subtotal + shipping;
   
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    alert('Ordine inviato con successo!');
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+
+  const orderPayload = {
+    status: "PENDING",
+    totalAmount: total,
+    user: {
+      id: 1 // TODO: заменить на ID текущего пользователя (например, из session)
+    },
+    items: cartItems.map(item => ({
+      quantity: item.quantity,
+      price: item.price,
+      product: {
+        id: item.id
+      }
+    }))
   };
+
+  try {
+    const response = await fetch('https://demo-deploy-gs0s.onrender.com/orders/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(orderPayload)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Errore backend: ${response.statusText}`);
+    }
+
+    setFormData({
+      email: '',
+      firstName: '',
+      lastName: '',
+      address: '',
+      city: '',
+      zipCode: '',
+      country: 'Italia',
+      cardNumber: '',
+      cardName: '',
+      expiry: '',
+      cvv: ''
+    });
+    setCartItems([]);
+
+    alert('Ordine inviato con successo!');
+  } catch (error) {
+    alert('Errore durante l\'invio dell\'ordine: ' + error);
+  }
+};
+
 
   return (
     

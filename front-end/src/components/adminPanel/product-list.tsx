@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import { ArrowUpDown, MoreHorizontal, Plus, Search, ChevronLeft, ChevronRight } from "lucide-react"
-
 import { Button } from "@/components/adminPanel/ui/button"
 import { Card } from "@/components/adminPanel/ui/card"
 import { Checkbox } from "@/components/adminPanel/ui/checkbox"
@@ -30,6 +29,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/adminPanel/ui/select"
+
+import { useRouter } from "next/navigation";
+
 
 
 
@@ -151,7 +153,7 @@ const handleActiveProduct = async (id: string) => {
       prev.length === products.length ? [] : products.map((product) => product.id)
     )
   }
-
+  const router = useRouter();
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -159,9 +161,9 @@ const handleActiveProduct = async (id: string) => {
           <h2 className="text-2xl font-bold tracking-tight">Products</h2>
           <p className="text-muted-foreground">Manage your product inventory and details</p>
         </div>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" /> Add Product
-        </Button>
+         <Button onClick={() => router.push("add-product")}>
+      <Plus className="mr-2 h-4 w-4" /> Add Product
+    </Button>
       </div>
       <div className="flex items-center gap-2">
         <div className="relative flex-1">

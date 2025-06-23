@@ -231,6 +231,8 @@ const Homepage = () => {
                   <Image 
                     src={product.image} 
                     alt={product.name}
+                    width={48}
+                    height={48}
                     className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
                   />
                   <div className="absolute top-4 left-4">

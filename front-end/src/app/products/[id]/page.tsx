@@ -57,7 +57,7 @@ const ProductDetails = () => {
   if (isLoading) return <p>Loading product details...</p>;
   if (error) return <p>{error}</p>;
   if (!product) return <p>Product not found.</p>;
-  if (product.status !== 'Active') return <p>This product is not available.</p>;
+  if (product.status !== 'ACTIVE') return <p>This product is not available.</p>;
 
 
   return (

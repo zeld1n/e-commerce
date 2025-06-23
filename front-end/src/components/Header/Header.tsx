@@ -105,7 +105,6 @@ export const Header = () => {
                 {isProfileOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white shadow-md border rounded-lg py-2">
                     <Link href="/profile" className="block px-4 py-2 hover:bg-gray-100">Il mio Profilo</Link>
-                    <Link href="/orders" className="block px-4 py-2 hover:bg-gray-100">I miei Ordini</Link>
                     <Link href="/wishlist" className="block px-4 py-2 hover:bg-gray-100">Lista Desideri</Link>
                     {userData?.role === 'admin' && (
                       <Link href="/adminPanel" className="block px-4 py-2 hover:bg-gray-100 text-blue-600">Admin Panel</Link>

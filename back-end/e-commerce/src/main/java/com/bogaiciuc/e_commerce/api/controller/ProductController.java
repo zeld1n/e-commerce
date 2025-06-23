@@ -1,5 +1,7 @@
 package com.bogaiciuc.e_commerce.api.controller;
+import com.bogaiciuc.e_commerce.persistence.entity.Category;
 import com.bogaiciuc.e_commerce.persistence.entity.Product;
+import com.bogaiciuc.e_commerce.persistence.repository.CategoryRepository;
 import com.bogaiciuc.e_commerce.persistence.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -48,17 +50,29 @@ public class ProductController {
     }
 
 
-
-
+    @Autowired
+    CategoryRepository categoryRepository;
     @PostMapping("/add")
     public ResponseEntity<Product> createProduct(@RequestBody Product product) {
-        if (product.getName().isEmpty() || product.getPrice() <= 0 || product.getQuantity() <= 0 || product.getImage().isEmpty()) {
+        if (product.getName().isEmpty() || product.getPrice() <= 0 || product.getQuantity() <= 0) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(product);
         } else {
+
+            Long categoryId = product.getCategory().getId();
+            Category category = categoryRepository.findById(categoryId)
+                    .orElse(null);
+
+            if (category == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
+
+            product.setCategory(category);
+
             Product saved = productRepository.save(product);
             return new ResponseEntity<Product>(saved, HttpStatus.CREATED);
         }
     }
+
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Product> updateProduct(@RequestBody Product newProduct, @PathVariable long id) {

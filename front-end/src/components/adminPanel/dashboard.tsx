@@ -6,7 +6,6 @@ import {  Box, LayoutDashboard, Package, Settings, ShoppingCart, Users } from "l
 import { Button } from "@/components/adminPanel/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/adminPanel/ui/card"
 import { Overview } from "@/components/adminPanel/overview"
-import { RecentSales } from "@/components/adminPanel/recent-sales"
 import { ProductList } from "@/components/adminPanel/product-list"
 import { OrderList } from "@/components/adminPanel/order-list"
 import { CustomerList } from "@/components/adminPanel/customer-list"
@@ -196,8 +195,8 @@ export default function Dashboard() {
                       </svg>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-2xl font-bold">+2,350</div>
-                      <p className="text-xs text-muted-foreground">+180.1% from last month</p>
+                      <div className="text-2xl font-bold">No info</div>
+                      <p className="text-xs text-muted-foreground">No info</p>
                     </CardContent>
                   </Card>
                   <Card>
@@ -218,8 +217,8 @@ export default function Dashboard() {
                       </svg>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-2xl font-bold">+12,234</div>
-                      <p className="text-xs text-muted-foreground">+19% from last month</p>
+                      <div className="text-2xl font-bold">No info</div>
+                      <p className="text-xs text-muted-foreground">No info</p>
                     </CardContent>
                   </Card>
                   <Card>
@@ -239,8 +238,8 @@ export default function Dashboard() {
                       </svg>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-2xl font-bold">573</div>
-                      <p className="text-xs text-muted-foreground">+201 since last week</p>
+                      <div className="text-2xl font-bold">14</div>
+                      
                     </CardContent>
                   </Card>
                 </div>
@@ -253,15 +252,7 @@ export default function Dashboard() {
                       <Overview />
                     </CardContent>
                   </Card>
-                  <Card className="col-span-3">
-                    <CardHeader>
-                      <CardTitle>Recent Sales</CardTitle>
-                      <CardDescription>You made 265 sales this month.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <RecentSales />
-                    </CardContent>
-                  </Card>
+                  
                 </div>
               </div>
             )}

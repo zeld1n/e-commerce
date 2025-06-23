@@ -67,6 +67,7 @@ export function OrderList() {
   // Фильтрация по поиску и статусу внутри текущей страницы
   const filteredOrders = useMemo(() => {
     return orders.filter(order => {
+
       const search = searchTerm.toLowerCase()
 
       const matchesSearch =
@@ -82,7 +83,8 @@ export function OrderList() {
     })
   }, [orders, searchTerm, statusFilter])
 
-  const totalPages = Math.ceil(totalOrders / pageSize)
+  const totalPages = Math.ceil(totalOrders/ pageSize)
+
 
   // Чекбоксы выбора заказов на странице
   const toggleOrder = (orderId: string) => {
@@ -90,6 +92,9 @@ export function OrderList() {
       prev.includes(orderId) ? prev.filter(id => id !== orderId) : [...prev, orderId]
     )
   }
+
+
+  console.log("filteredOrders.length:", filteredOrders.length, "totalPages:", totalPages);
 
   const toggleAll = () => {
     const idsOnPage = filteredOrders.map(order => order.id.toString())

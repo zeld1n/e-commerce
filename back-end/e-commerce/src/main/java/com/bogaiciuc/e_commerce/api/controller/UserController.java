@@ -41,7 +41,9 @@ public class UserController {
 
     @GetMapping(path = "/all")
     public @ResponseBody Iterable<User> getAllUsers() {
+
         return userRepository.findAll();
+
     }
 
 
@@ -97,6 +99,21 @@ public class UserController {
 
             return ResponseEntity.ok(Map.of("username", user.get().getUsername(), "role", user.get().getRole()));
         }
+
+
+    @CrossOrigin(origins = "https://e-commerce-six-rho.vercel.app",allowCredentials = "true")
+    @GetMapping("/profile")
+    public ResponseEntity<Optional<User>> getProfile(@CookieValue(value = "session", required = false) String sessionId) {
+        Optional<Session> session = sessionRepository.findBySessionId(sessionId);
+        if(session.isPresent()) {
+            int userID = session.get().getUserId();
+            Optional<User> user= userRepository.findById(userID);
+            return ResponseEntity.ok(user);
+        }else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
 
 
     @CrossOrigin(origins = "https://e-commerce-six-rho.vercel.app", allowCredentials = "true")
