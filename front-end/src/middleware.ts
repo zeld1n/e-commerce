@@ -5,13 +5,13 @@ export function middleware(request: NextRequest) {
   const sessionId = request.cookies.get('session')?.value;
   const pathname = request.nextUrl.pathname;
 
-  const isAdminRoute = pathname.startsWith('/adminPanel');
+  {/* const isAdminRoute = pathname.startsWith('/adminPanel');*/}
   const isCheckoutRoute = pathname.startsWith('/checkout');
 
   // Для /adminPanel — просто проверяем, есть ли сессия
-  if (isAdminRoute && !sessionId) {
+    {/*if (isAdminRoute && !sessionId) {
     return NextResponse.redirect(new URL('/login', request.url));
-  }
+  }*/}
 
   // Для /checkout — тоже просто наличие сессии
   if (isCheckoutRoute && !sessionId) {
@@ -22,5 +22,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/adminPanel/:path*', '/checkout/:path*'],
+  matcher: ['/checkout/:path*',{/* /adminPanel/:path*,*/}],
 };
